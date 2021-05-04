@@ -32,7 +32,8 @@ module.exports = function(app, swig, gestorBD) {
     app.get("/registrarse", function(req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {
             user: req.session.usuario,
-            dinero: req.session.dinero
+            dinero: req.session.dinero,
+            admin: req.session.admin
         });
         res.send(respuesta);
     });
@@ -43,7 +44,8 @@ module.exports = function(app, swig, gestorBD) {
         swig.renderFile('views/base.html', {usuario: req.session.usuario});
         let respuesta = swig.renderFile('views/bidentificacion.html', {
             user: req.session.usuario,
-            dinero: req.session.dinero
+            dinero: req.session.dinero,
+            admin: req.session.admin
         });
         res.send(respuesta);
     });
@@ -63,7 +65,14 @@ module.exports = function(app, swig, gestorBD) {
             } else {
                 req.session.usuario = usuarios[0].email;
                 req.session.dinero = usuarios[0].dinero;
-                res.redirect("/tienda");
+                req.session.admin = usuarios[0].tipo;
+                if(usuarios[0].tipo == "admin"){
+                    res.redirect("/administrador");
+                }
+                else{
+                    res.redirect("/tienda");
+                }
+
             }
         });
     });
@@ -71,7 +80,8 @@ module.exports = function(app, swig, gestorBD) {
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         req.session.dinero = null;
-        res.send("Usuario desconectado");
+        req.session.admin = null;
+        res.redirect("/tienda");
     })
 
 
@@ -85,7 +95,36 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         ofertas : ofertas,
                         user: req.session.usuario,
-                        dinero: req.session.dinero
+                        dinero: req.session.dinero,
+                        admin: req.session.admin
+                    });
+                res.send(respuesta);
+            }
+        });
+    });
+
+    app.get("/administrador", function(req, res) {
+        let respuesta = swig.renderFile('views/badministrador.html', {
+            user: req.session.usuario,
+            dinero: req.session.dinero,
+            admin: req.session.admin
+        });
+        res.send(respuesta);
+    });
+
+
+    app.get("/listaUsuarios", function(req, res) {
+        let criterio = {};
+        gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+            if (usuarios == null) {
+                res.send("Error al listar ");
+            } else {
+                let respuesta = swig.renderFile('views/blistausuarios.html',
+                    {
+                        usuarios : usuarios,
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
+                        admin: req.session.admin
                     });
                 res.send(respuesta);
             }

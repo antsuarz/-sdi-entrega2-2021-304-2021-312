@@ -4,6 +4,8 @@ module.exports = function(app, swig, gestorBD) {
 
         let respuesta = swig.renderFile('views/btienda.html', {
             user: req.session.usuario,
+            admin: req.session.admin,
+            dinero: req.session.dinero,
             ofertas : ofertas
         });
         res.send(respuesta);
@@ -12,7 +14,8 @@ module.exports = function(app, swig, gestorBD) {
 
         let respuesta = swig.renderFile('views/bagregar.html', {
             user: req.session.usuario,
-            dinero: req.session.dinero
+            dinero: req.session.dinero,
+            admin: req.session.admin
         });
         res.send(respuesta);
     })
@@ -28,7 +31,8 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         oferta : ofertas[0],
                         user: req.session.usuario,
-                        dinero: req.session.dinero
+                        dinero: req.session.dinero,
+                        admin: req.session.admin
                     });
                 res.send(respuesta);
             }
@@ -81,7 +85,8 @@ module.exports = function(app, swig, gestorBD) {
                     {
                         ofertas : ofertas,
                         user: req.session.usuario,
-                        dinero: req.session.dinero
+                        dinero: req.session.dinero,
+                        admin: req.session.admin
                     });
                 res.send(respuesta);
             }
