@@ -24,10 +24,17 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
+        {% if admin != 'admin' %}
         <li id="mTienda" class="active"><a href="/tienda">Tienda</a></li>
+        {%if user != null%}
 		<li id="mPublicaciones"><a href="/publicaciones">Publicaciones</a></li>
         <li id="mCompras"><a href="/compras">Compras</a></li>
-        {% if user != null && dinero !=null %}
+        {%endif%}
+        {% endif %}
+        {% if admin == 'admin' %}
+        <li id="mListaUsuarios"><a href="/listaUsuarios">Lista de usuarios</a></li>
+        {% endif %}
+        {% if user != null && dinero !=null && admin != 'admin' %}
         <li id="mDinero"><a >Dinero:{{dinero}}</a></li>
         <li id="mEmail"><a>Email:{{user}}</a></li>
         {% endif %}

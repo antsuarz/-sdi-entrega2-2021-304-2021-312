@@ -2,13 +2,19 @@
 {% block titulo %} Lista de Ofertas – myWallapop {% endblock %}
 {% block contenido_principal %}
 <!-- Búsqueda -->
+
+{% if user == null %}
+<div class="row">
+    <h2>No estás conectado.</h2>
+</div>
+{%else%}
 <div class="row">
     <div id="custom-search-input ">
         <form method="get" action="/tienda" >
             <div
                     class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
                 <input type="text" class="search-query form-control"
-                       placeholder="Oferta que busca" name="busqueda"/>
+                       placeholder="Buscador de ofertas" name="busqueda"/>
                 <span class="input-group-btn">
                     <button class="btn" type="submit">
 <span class="glyphicon glyphicon-search"></span>
@@ -52,4 +58,5 @@
         <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
     </ul>
 </div>
+{%endif%}
 {% endblock %}
