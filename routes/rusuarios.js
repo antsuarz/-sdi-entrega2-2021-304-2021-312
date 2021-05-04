@@ -20,9 +20,9 @@ module.exports = function(app, swig, gestorBD) {
             }
             gestorBD.insertarUsuario(usuario, function (id) {
                 if (id == null) {
-                    res.send("Error al insertar el usuario");
+                    res.redirect("/registrarse?mensaje=Error al registrar el usuario");
                 } else {
-                    res.send('Usuario Insertado ' + id);
+                    res.redirect("/tienda");
                 }
             });
         }
@@ -59,9 +59,9 @@ module.exports = function(app, swig, gestorBD) {
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null || usuarios.length == 0) {
-                req.session.usuario = null;
-                req.session.dinero = null;
-                res.redirect("/identificarse");
+                res.redirect("/identificarse" +
+                    "?mensaje=Crocolisco"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0].email;
                 req.session.dinero = usuarios[0].dinero;
@@ -89,7 +89,9 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = { autor : req.session.usuario };
         gestorBD.obtenerOfertas(criterio, function(ofertas) {
             if (ofertas == null) {
-                res.send("Error al listar ");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 let respuesta = swig.renderFile('views/bpublicaciones.html',
                     {
@@ -117,7 +119,9 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = {};
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null) {
-                res.send("Error al listar ");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 let respuesta = swig.renderFile('views/blistausuarios.html',
                     {

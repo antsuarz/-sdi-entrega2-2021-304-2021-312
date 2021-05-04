@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block titulo %} Mis Compras {% endblock %}
+
+{% block contenido_principal %}
+<h2>Mis compras</h2>
+
+<!-- Agregar Oferta -->
+<div class="table-responsive">
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Nombre</th>
+				<th>Detalles</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for oferta in ofertas %}
+			<tr>
+				<td>{{ oferta.nombre }}</td>
+				<td>{{ oferta.detalles }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+{% endblock %}

@@ -25,7 +25,9 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) };
         gestorBD.obtenerOfertas(criterio,function(ofertas){
             if ( ofertas == null ){
-                res.send("Error al recuperar la oferta.");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 let respuesta = swig.renderFile('views/boferta.html',
                     {
@@ -49,12 +51,15 @@ module.exports = function(app, swig, gestorBD) {
             detalles: req.body.detalles,
             fecha: fechaString,
             autor: req.session.usuario,
-            precio:req.body.precio
+            precio:req.body.precio,
+            comprado: false
         }
         // Conectarse
         gestorBD.insertarOferta(oferta, function(id){
             if (id == null) {
-                res.send("Error al insertar la oferta");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 if (req.files.foto != null) {
                     var imagen = req.files.foto;
@@ -62,7 +67,7 @@ module.exports = function(app, swig, gestorBD) {
                         if (err) {
                             res.send("Error al subir la foto");
                         } else {
-                            res.send("Agregada id: " + id);
+                            res.redirect("/publicaciones");
                         }
                     });
                 }
@@ -74,12 +79,14 @@ module.exports = function(app, swig, gestorBD) {
     app.get("/tienda", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
-            criterio = { "nombre" :  {$regex : ".*"+req.query.busqueda+".*"} };
+            criterio = { "nombre" :  {$regex : ".*"+req.query.busqueda+".*"}};
         }
 
         gestorBD.obtenerOfertas( criterio,function(ofertas) {
             if (ofertas == null) {
-                res.send("Error al listar ");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 let respuesta = swig.renderFile('views/btienda.html',
                     {
@@ -92,5 +99,59 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     });
+
+    app.get('/oferta/eliminar/:id', function (req, res) {
+        let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
+        gestorBD.eliminarOferta(criterio,function(ofertas){
+            if ( ofertas == null ){
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
+            } else {
+                res.redirect("/publicaciones");
+            }
+        });
+    })
+
+    app.get('/oferta/comprar/:id', function (req, res) {
+        let ofertaId = gestorBD.mongo.ObjectID(req.params.id);
+        let compra = {
+            usuario : req.session.usuario,
+            ofertaId : ofertaId
+        }
+        gestorBD.insertarCompra(compra ,function(idCompra){
+            if (idCompra == null ){
+                res.send("ha habido un error");
+            } else {
+                res.redirect("/compras");
+            }
+        });
+    });
+
+    app.get("/compras", function(req,res){
+        let criterio = {"usuario" : req.session.usuario};
+        gestorBD.obtenerCompras(criterio, function (compras){
+            if(compras == null){
+                res.send("Error al listar");
+            }
+            else {
+                let ofertasCompradasIds = [];
+                for(i=0; i < compras.length; i++){
+                    ofertasCompradasIds.push(compras[i].ofertaId);
+                }
+
+                let criterio = {"_id" : {$in: ofertasCompradasIds}}
+                gestorBD.obtenerOfertas(criterio, function (ofertas){
+                    let respuesta = swig.renderFile('views/bcompras.html', {
+                        ofertas : ofertas,
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
+                        admin: req.session.admin
+                    });
+                    res.send(respuesta);
+                });
+            }
+        });
+    })
 
 };
