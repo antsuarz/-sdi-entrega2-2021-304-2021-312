@@ -1,0 +1,22 @@
+{% extends "base.html" %} 
+
+{% block titulo %} Detalles de la oferta {{ oferta.nombre }}{% endblock %}
+
+{% block contenido_principal %}
+	 <div class="row">
+		<div class="media col-xs-10">
+		  <div class="media-left media-middle">
+			<img class="media-object" src="/fotos/{{ oferta._id.toString() }}.png"  >
+		  </div>
+		  <div class="media-body">
+			 <h2>{{oferta.nombre}}</h2>
+			 <p>{{oferta.autor}}</p>
+			 <p>{{oferta.detalles}}</p>
+			  <p>{{oferta.fecha}}</p>
+			 <button type="button" class="btn btn-primary pull-right">{{oferta.precio}} €</button>
+		  </div>
+		</div>
+	  </div>
+	  
+
+{% endblock %}
