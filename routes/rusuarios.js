@@ -106,6 +106,7 @@ module.exports = function (app, swig, gestorBD) {
     });
 
     app.get("/administrador", function (req, res) {
+        //TODO comprobar que solo administrador se puede meter en esta pagina
         let respuesta = swig.renderFile('views/badministrador.html', {
             user: req.session.usuario,
             dinero: req.session.dinero,
@@ -116,6 +117,7 @@ module.exports = function (app, swig, gestorBD) {
 
 
     app.get("/listaUsuarios", function (req, res) {
+        //TODO comprobar que solo administrador se puede meter en esta pagina
         let criterio = {};
         gestorBD.obtenerUsuarios(criterio, function (usuarios) {
             if (usuarios == null) {
@@ -132,5 +134,22 @@ module.exports = function (app, swig, gestorBD) {
             }
         });
     });
+    app.get('/listaUsuarios/eliminar', function (req, res) {
 
+        console.log(req.body.usuario);
+        console.log(req.session.usuario);
+        console.log(req.session.usuario);
+        //
+        //
+        // const checkboxes = document.querySelectorAll('input[name="usuario"]:checked');
+
+        // let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        // gestorBD.eliminarCancion(criterio, function (canciones) {
+        //     if (canciones == null) {
+        //         res.send(respuesta);
+        //     } else {
+        //         res.redirect("/publicaciones");
+        //     }
+        // });
+    });
 };
