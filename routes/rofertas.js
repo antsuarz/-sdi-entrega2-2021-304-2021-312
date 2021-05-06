@@ -45,7 +45,7 @@ module.exports = function(app, swig, gestorBD) {
 
 
         var date = new Date();
-        var fechaString = date.getDay() + "/" +date.getMonth() + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
+        var fechaString = date.getUTCDay() + "/" +date.getMonth() + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
         let oferta = {
             nombre: req.body.nombre,
             detalles: req.body.detalles,
@@ -53,6 +53,9 @@ module.exports = function(app, swig, gestorBD) {
             autor: req.session.usuario,
             precio:req.body.precio,
             comprado: false
+        }
+        if (oferta.precio <= 0) {
+            res.redirect("/oferta/agregar?mensaje=El precio de la oferta debe ser superior a 0. &tipoMensaje=alert-danger");
         }
         // Conectarse
         gestorBD.insertarOferta(oferta, function(id){
@@ -114,18 +117,74 @@ module.exports = function(app, swig, gestorBD) {
     })
 
     app.get('/oferta/comprar/:id', function (req, res) {
-        let ofertaId = gestorBD.mongo.ObjectID(req.params.id);
-        let compra = {
-            usuario : req.session.usuario,
-            ofertaId : ofertaId
-        }
-        gestorBD.insertarCompra(compra ,function(idCompra){
-            if (idCompra == null ){
-                res.send("ha habido un error");
-            } else {
-                res.redirect("/compras");
+        let ofertaId = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.obtenerOfertas(ofertaId, function(oferta){
+            if(oferta == null){
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             }
-        });
+            else{
+                if(oferta[0].comprado){
+                    res.redirect("/tienda" +
+                        "?mensaje=La oferta ya fue vendida"+
+                        "&tipoMensaje=alert-danger ");
+                }
+                else if(oferta[0].precio > req.session.dinero){
+                    res.redirect("/tienda" +
+                        "?mensaje=No tienes suficiente dinero para comprar esta oferta"+
+                        "&tipoMensaje=alert-danger ");
+                }
+                else{
+                    let ofertaModificada = {
+                        comprado: true
+                    }
+                    gestorBD.modificarOferta(ofertaId, ofertaModificada, function (result) {
+                        if (result == null) {
+                            res.redirect("/tienda" +
+                                "?mensaje=Se ha producido un error inesperado al modificar el estado de la oferta"+
+                                "&tipoMensaje=alert-danger ");
+                        } else {
+                            let compra = {
+                                usuario : req.session.usuario,
+                                ofertaId : ofertaId
+                            }
+                            gestorBD.insertarCompra(compra ,function(idCompra){
+                                if (idCompra == null ){
+                                    res.redirect("/tienda" +
+                                        "?mensaje=Se ha producido un error al insertar su compra en la base de datos"+
+                                        "&tipoMensaje=alert-danger ");
+                                } else {
+                                    let comprador={"_id": gestorBD.mongo.ObjectID(req.session.user._id)};
+                                    let dineroActual = {dinero: req.session.dinero - oferta[0].precio};
+                                    gestorBD.modificarDineroUsuario(comprador,dineroActual, function (id){
+                                        if (id == null) {
+                                            res.send("Error al insertar la oferta y restar el dinero");
+                                        } else {
+                                            let criterio = {
+                                                email : req.session.usuario,
+                                            }
+                                            gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+                                                if (usuarios == null || usuarios.length == 0) {
+                                                    res.redirect("/identificarse" +
+                                                        "?mensaje=No se ha podido identificar al usuario"+
+                                                        "&tipoMensaje=alert-danger ");
+                                                } else {
+                                                    req.session.dinero = usuarios[0].dinero;
+                                                    res.redirect("/compras");
+                                                }
+                                            });
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    })
+
+                }
+            }
+        })
     });
 
     app.get("/compras", function(req,res){
@@ -137,7 +196,7 @@ module.exports = function(app, swig, gestorBD) {
             else {
                 let ofertasCompradasIds = [];
                 for(i=0; i < compras.length; i++){
-                    ofertasCompradasIds.push(compras[i].ofertaId);
+                    ofertasCompradasIds.push(compras[i].ofertaId._id);
                 }
 
                 let criterio = {"_id" : {$in: ofertasCompradasIds}}
