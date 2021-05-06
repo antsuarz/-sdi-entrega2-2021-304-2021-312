@@ -1,0 +1,24 @@
+{
+  "name": "sdi-entrega2-2021-304-2021-312",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antsuarz/sdi-entrega2-2021-304-2021-312.git"
+  },
+  "author": "2021-304-2021-312",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/antsuarz/sdi-entrega2-2021-304-2021-312/issues"
+  },
+  "homepage": "https://github.com/antsuarz/sdi-entrega2-2021-304-2021-312#readme"
+}
