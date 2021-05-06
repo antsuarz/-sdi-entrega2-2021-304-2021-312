@@ -134,22 +134,37 @@ module.exports = function (app, swig, gestorBD) {
             }
         });
     });
-    app.get('/listaUsuarios/eliminar', function (req, res) {
+    app.post('/listaUsuarios', function (req, res) {
 
-        console.log(req.body.usuario);
-        console.log(req.session.usuario);
-        console.log(req.session.usuario);
-        //
-        //
-        // const checkboxes = document.querySelectorAll('input[name="usuario"]:checked');
+        // console.log(req.body.usuario);
+        for (let i = 0; i < req.body.usuario.length; i++) {
+            // console.log(req.body.usuario[i]);
+            let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
+            gestorBD.eliminarUsuario(criterio, function (usuarios) {
+                if (usuarios == null) {
+                    res.send('Error al eliminar usuarios.');
+                } else {
+                    //si todo va bien vuelvo a cargar los datos de la pagina en vez de un redirect por seguridad
+                    let criterio = {};
+                    gestorBD.obtenerUsuarios(criterio, function (usuarios) {
+                        if (usuarios == null) {
+                            res.send("Error al listar ");
+                        } else {
+                            let respuesta = swig.renderFile('views/blistausuarios.html',
+                                {
+                                    usuarios: usuarios,
+                                    user: req.session.usuario,
+                                    dinero: req.session.dinero,
+                                    admin: req.session.admin
+                                });
+                            res.send(respuesta);
+                        }
+                    });
+                }
+            });
 
-        // let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        // gestorBD.eliminarCancion(criterio, function (canciones) {
-        //     if (canciones == null) {
-        //         res.send(respuesta);
-        //     } else {
-        //         res.redirect("/publicaciones");
-        //     }
-        // });
+        }
+
+
     });
 };

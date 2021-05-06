@@ -6,7 +6,7 @@
 
 
 <div class="table-responsive">
-    <form class="form-horizontal" method="post" action="/listaUsuarios/eliminar">
+    <form method="post" action="/listaUsuarios">
 
     <table class="table table-hover">
         <thead>
@@ -26,7 +26,6 @@
             <td>{{ usuario.email }}</td>
             <td><label>
                 <input name="usuario" type="checkbox" id="{{ usuario._id.toString() }}" value="{{ usuario._id.toString() }}" for="usuario">
-                {{ oferta._id.toString() }}
             </label> <br>
             </td>
         </tr>
@@ -35,7 +34,8 @@
         </tbody>
     </table>
         <div class="row text-right">
-            <a  type="submit" id="btnDelete" href="/listaUsuarios/eliminar/" class="btn btn-danger" role="button" > Eliminar Usuarios </a>
+            <button class="btn btn-danger"  type="submit" > Eliminar Usuarios </button>
+<!--            id="btnDelete"  class="btn btn-danger" role="button" onclick="getSelectedCheckboxValues('usuario')"-->
         </div>
     </form>
 </div>
@@ -47,22 +47,22 @@
 
 <!--<button id="btn" href="/listaUsuarios/eliminar/">Get Selected Colors</button>-->
 
-<!--<script >-->
-<!--    function getSelectedCheckboxValues(name) {-->
-<!--        const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);-->
-<!--        let values = [];-->
-<!--        checkboxes.forEach((checkbox) => {-->
-<!--            values.push(checkbox.value);-->
-<!--        });-->
-<!--        return values;-->
-<!--    }-->
+<script >
+    function getSelectedCheckboxValues(name) {
+        const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+        let values = [];
+        checkboxes.forEach((checkbox) => {
+            values.push(checkbox.value);
+        });
+        return values;
+    }
 
-<!--    const btn = document.querySelector('#btnDelete');-->
-<!--    btn.addEventListener('click', (event) => {-->
-
-<!--        alert(getSelectedCheckboxValues('usuario'));-->
-<!--    });-->
-<!--</script>-->
+    // const btn = document.querySelector('#btnDelete');
+    // btn.addEventListener('click', (event) => {
+    //
+    //     alert(getSelectedCheckboxValues('usuario'));
+    // });
+</script>
 
 
 
