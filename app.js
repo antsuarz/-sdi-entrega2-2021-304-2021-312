@@ -36,20 +36,24 @@ app.listen(app.get('port'), function(){
     console.log('servidor activo');
 });
 
-// routerUsuarioSession
-var routerUsuarioSession = express.Router();
-routerUsuarioSession.use(function(req, res, next) {
-    console.log("routerUsuarioSession");
-    if ( req.session.usuario ) {
-        next();
-    } else {
-        console.log("va a : "+req.session.destino)
-        res.redirect("/identificarse");
-    }
+//routerUsuarioAutor
+let routerUsuarioAutor = express.Router();
+routerUsuarioAutor.use(function(req, res, next) {
+    console.log("routerUsuarioAutor");
+    let path = require('path');
+    let id = path.basename(req.originalUrl);
+    gestorBD.obtenerOfertas(
+        {_id: mongo.ObjectID(id) }, function (ofertas) {
+            console.log(ofertas[0]);
+            if(ofertas[0].autor == req.session.usuario ){
+                next();
+            } else {
+                res.redirect("/tienda");
+            }
+        })
 });
+//Aplicar routerUsuarioAutor
+app.use("/oferta/eliminar",routerUsuarioAutor);
 
-//Aplicar routerUsuarioSession
-app.use("/ofertas/agregar",routerUsuarioSession);
-app.use("/publicaciones",routerUsuarioSession);
 
 app.use(express.static('public'));
