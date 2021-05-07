@@ -7,6 +7,9 @@ app.use(expressSession({
     resave: true,
     saveUninitialized: true
 }));
+
+let jwt = require('jsonwebtoken');
+app.set('jwt',jwt);
 let crypto = require('crypto');
 let fileUpload = require('express-fileupload');
 app.use(fileUpload());
@@ -24,12 +27,14 @@ app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:270
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
-//TODO al comprar que se actualice el precio y se actualice de la base de datos
 //TODO validaciones de forms
 //TODO soap
 //Rutas
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rofertas.js")(app, swig, gestorBD);
+require("./routes/rapiofertas.js")(app, gestorBD);
+require("./routes/rapiusuarios.js")(app, gestorBD);
+
 
 
 app.listen(app.get('port'), function(){
@@ -54,6 +59,35 @@ routerUsuarioAutor.use(function(req, res, next) {
 });
 //Aplicar routerUsuarioAutor
 app.use("/oferta/eliminar",routerUsuarioAutor);
+
+// routerUsuarioToken
+let routerUsuarioToken = express.Router();
+routerUsuarioToken.use(function(req, res, next) {
+    let token = req.headers['token'] || req.body.token || req.query.token;
+    if (token != null) {
+        // verificar el token
+        jwt.verify(token, 'secreto', function(err, infoToken) {
+            if (err || (Date.now()/1000 - infoToken.tiempo) > 240 ){
+                res.status(403); // Forbidden
+                res.json({
+                    acceso : false,
+                    error: 'Token invalido o caducado'
+                });
+                return;
+            } else {
+                res.usuario = infoToken.usuario;
+                next();
+            }
+        });
+    } else {
+        res.status(403); // Forbidden
+        res.json({
+            acceso : false,
+            mensaje: 'No hay Token'
+        });
+    }
+});
+app.use('/api/oferta', routerUsuarioToken);
 
 
 app.use(express.static('public'));
