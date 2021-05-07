@@ -1,18 +1,25 @@
 package com.uniovi.tests;
 
-//Paquetes Java
-import java.util.List;
-//Paquetes JUnit 
-import org.junit.*;
-import org.junit.runners.MethodSorters;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+//Paquetes JUnit 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 //Paquetes Selenium 
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.*;
-//Paquetes Utilidades de Testing Propias
-import com.uniovi.tests.util.SeleniumUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+import com.uniovi.tests.pageobjects.PO_DataBase;
 //Paquetes con los Page Object
-import com.uniovi.tests.pageobjects.*;
+import com.uniovi.tests.pageobjects.PO_View;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -24,13 +31,16 @@ public class SdiEntrega2Tests {
 	// static String Geckdriver024 = "C:\\Path\\geckodriver024win64.exe";
 	// En MACOSX (Debe ser la versión 65.0.1 y desactivar las actualizacioens
 	// automáticas):
-	static String PathFirefox65 = "/Applications/Firefox 2.app/Contents/MacOS/firefox-bin";
+//	static String PathFirefox65 = "/Applications/Firefox 2.app/Contents/MacOS/firefox-bin";
 	// static String PathFirefox64 =
 	// "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
-	static String Geckdriver024 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver024mac";
+//	static String Geckdriver024 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver024mac";
 	// static String Geckdriver022 =
 	// "/Users/delacal/Documents/SDI1718/firefox/geckodriver023mac";
 	// Común a Windows y a MACOSX
+	
+	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox65\\firefox.exe";
+	static String Geckdriver024 = "C:\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -41,11 +51,17 @@ public class SdiEntrega2Tests {
 		return driver;
 	}
 
-	@Before
-	public void setUp() {
-		driver.navigate().to(URL);
+	private void navigateUrl(String URL, String pag) {
+		driver.navigate().to(URL + pag);
+		// new WebDriverWait(driver, 2);
 	}
 
+	// Antes de cada prueba se navega al URL home de la aplicación
+	@Before
+	public void setUp() {
+		navigateUrl(URL, "");
+	}
+	// Después de cada prueba se borran las cookies del navegador
 	@After
 	public void tearDown() {
 		driver.manage().deleteAllCookies();
@@ -65,12 +81,28 @@ public class SdiEntrega2Tests {
 		driver.quit();
 	}
 
+	@Test
+	public void Prueba00Conexion() {
+
+		System.out.println(driver.getCurrentUrl());
+		System.out.println();
+		WebElement prueba = driver.findElement(By.id("prueba"));
+		System.out.println("-------------------");
+		System.out.println(prueba.getText());
+		assertEquals(prueba.getText(), "Wallapop App");
+
+//	WebElement we = driver.getTitle();
+
+	}
+	
+	
 	/**
 	 * [Prueba1] Registro de Usuario con datos válidos.
 	 */
 	@Test
 	public void PR01() {
-		assertTrue("PR01 sin hacer", false);
+		PO_DataBase.InitMongoDB();
+//		assertTrue("PR01 sin hacer", false);
 	}
 
 	/**
