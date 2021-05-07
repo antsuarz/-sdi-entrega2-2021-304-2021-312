@@ -18,11 +18,25 @@ module.exports = function(app, swig, gestorBD) {
                 dinero: 100,
                 tipo: "noadmin"
             }
-            gestorBD.insertarUsuario(usuario, function (id) {
-                if (id == null) {
-                    res.send("Error al insertar el usuario");
+            let criterio = {
+                email : req.body.email,
+            }
+            gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+                if (usuarios == null || usuarios.length != 0) {
+                    res.redirect("/registrarse" +
+                        "?mensaje=El usuario ya está registrado en la base de datos"+
+                        "&tipoMensaje=alert-danger ");
                 } else {
-                    res.send('Usuario Insertado ' + id);
+                    gestorBD.insertarUsuario(usuario, function (id) {
+                        if (id == null) {
+                            res.redirect("/registrarse?mensaje=Error al registrar el usuario");
+                        } else {
+                            req.session.usuario = usuario.email;
+                            req.session.dinero = usuario.dinero;
+                            req.session.admin = usuario.tipo;
+                            res.redirect("/tienda");
+                        }
+                    });
                 }
             });
         }
@@ -59,13 +73,14 @@ module.exports = function(app, swig, gestorBD) {
         }
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null || usuarios.length == 0) {
-                req.session.usuario = null;
-                req.session.dinero = null;
-                res.redirect("/identificarse");
+                res.redirect("/identificarse" +
+                    "?mensaje=Algo va mal"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0].email;
                 req.session.dinero = usuarios[0].dinero;
                 req.session.admin = usuarios[0].tipo;
+                req.session.user = usuarios[0];
                 if(usuarios[0].tipo == "admin"){
                     res.redirect("/administrador");
                 }
@@ -81,6 +96,7 @@ module.exports = function(app, swig, gestorBD) {
         req.session.usuario = null;
         req.session.dinero = null;
         req.session.admin = null;
+        req.session.id = null;
         res.redirect("/tienda");
     })
 
@@ -89,7 +105,9 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = { autor : req.session.usuario };
         gestorBD.obtenerOfertas(criterio, function(ofertas) {
             if (ofertas == null) {
-                res.send("Error al listar ");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 let respuesta = swig.renderFile('views/bpublicaciones.html',
                     {
@@ -117,7 +135,9 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = {};
         gestorBD.obtenerUsuarios(criterio, function(usuarios) {
             if (usuarios == null) {
-                res.send("Error al listar ");
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
             } else {
                 let respuesta = swig.renderFile('views/blistausuarios.html',
                     {

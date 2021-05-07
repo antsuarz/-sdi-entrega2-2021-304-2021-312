@@ -10,6 +10,7 @@
 			<tr>
 				<th>Nombre</th>
 				<th>Detalles</th>
+				<th>Destacada</th>
 				<th class="col-md-1"></th>
 			</tr>
 		</thead>
@@ -18,9 +19,17 @@
 			<tr>
 				<td>{{ oferta.nombre }}</td>
 				<td>{{ oferta.detalles }}</td>
-				<td><a href="/oferta/modificar/{{ oferta._id.toString() }}">Modificar</a> <br>
-					<a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
+				{%if oferta.destacada == "on"%}
+				<td>Sí</td>
+				{%else%}
+				<td>No</td>
+				{% endif%}
+				{%if !oferta.comprado%}
+				<td><a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
 			    </td>
+				{%else%}
+				<td>¡Oferta Vendida!</td>
+				{% endif%}
 			</tr>
 		{% endfor %}
 		</tbody>
