@@ -6,6 +6,8 @@
 
 
 <div class="table-responsive">
+    <form method="post" action="/listaUsuarios">
+
     <table class="table table-hover">
         <thead>
         <tr>
@@ -22,18 +24,46 @@
             <td>{{ usuario.nombre }}</td>
             <td>{{ usuario.apellido }}</td>
             <td>{{ usuario.email }}</td>
-            <td><a href="/usuario/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
+            <td><label>
+                <input name="usuario" type="checkbox" id="{{ usuario._id.toString() }}" value="{{ usuario._id.toString() }}" for="usuario">
+            </label> <br>
             </td>
         </tr>
         {% endif %}
         {% endfor %}
         </tbody>
     </table>
+        <div class="row text-right">
+            <button class="btn btn-danger"  type="submit" > Eliminar Usuarios </button>
+<!--            id="btnDelete"  class="btn btn-danger" role="button" onclick="getSelectedCheckboxValues('usuario')"-->
+        </div>
+    </form>
 </div>
 
-<!-- Agregar oferta -->
-<div class="row text-right">
-    <a href="/ofertas/agregar" class="btn btn-info" role="button">Agregar oferta</a>
-</div>
+
+<!--<input type="checkbox" name="color" value="red"> Red-->
+<!--<input type="checkbox" name="color" value="green"> Green-->
+<!--<input type="checkbox" name="color" value="blue"> Blue-->
+
+<!--<button id="btn" href="/listaUsuarios/eliminar/">Get Selected Colors</button>-->
+
+<script >
+    function getSelectedCheckboxValues(name) {
+        const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+        let values = [];
+        checkboxes.forEach((checkbox) => {
+            values.push(checkbox.value);
+        });
+        return values;
+    }
+
+    // const btn = document.querySelector('#btnDelete');
+    // btn.addEventListener('click', (event) => {
+    //
+    //     alert(getSelectedCheckboxValues('usuario'));
+    // });
+</script>
+
+
 
 {% endblock %}
