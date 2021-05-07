@@ -70,25 +70,7 @@ module.exports = function(app, swig, gestorBD) {
                             "?mensaje=Ha ocurrido un error al modificar el dinero del usuario"+
                             "&tipoMensaje=alert-danger ");
                     } else {
-                        gestorBD.insertarOferta(oferta, function (id) {
-                            if (id == null) {
-                                res.redirect("/tienda" +
-                                    "?mensaje=Ha ocurrido un error inesperado" +
-                                    "&tipoMensaje=alert-danger ");
-                            } else {
-                                if (req.files.foto != null) {
-                                    var imagen = req.files.foto;
-                                    imagen.mv('public/fotos/' + id + '.png', function (err) {
-                                        if (err) {
-                                            res.send("Error al subir la foto");
-                                        } else {
-                                            res.redirect("/publicaciones");
-                                        }
-                                    });
-                                }
-
-                            }
-                        });
+                        insertarUsuarioBD(oferta, req ,res);
                     }
                 });
             } else {
@@ -98,29 +80,10 @@ module.exports = function(app, swig, gestorBD) {
             }
         }
         else {
-            gestorBD.insertarOferta(oferta, function (id) {
-                if (id == null) {
-                    res.redirect("/tienda" +
-                        "?mensaje=Ha ocurrido un error inesperado" +
-                        "&tipoMensaje=alert-danger ");
-                } else {
-                    if (req.files.foto != null) {
-                        var imagen = req.files.foto;
-                        imagen.mv('public/fotos/' + id + '.png', function (err) {
-                            if (err) {
-                                res.redirect("/oferta/agregar" +
-                                    "?mensaje=Se ha producido un error al cargar la imagen"+
-                                    "&tipoMensaje=alert-danger ");
-                            } else {
-                                res.redirect("/publicaciones");
-                            }
-                        });
-                    }
-
-                }
-            });
+            insertarUsuarioBD(oferta, req, res);
         }
     });
+
 
 
 
@@ -290,6 +253,30 @@ module.exports = function(app, swig, gestorBD) {
             }
         });
     })
+
+    function insertarUsuarioBD(oferta, req, res){
+        gestorBD.insertarOferta(oferta, function (id) {
+            if (id == null) {
+                res.redirect("/tienda" +
+                    "?mensaje=Ha ocurrido un error inesperado" +
+                    "&tipoMensaje=alert-danger ");
+            } else {
+                if (req.files.foto != null) {
+                    var imagen = req.files.foto;
+                    imagen.mv('public/fotos/' + id + '.png', function (err) {
+                        if (err) {
+                            res.redirect("/oferta/agregar" +
+                                "?mensaje=Se ha producido un error al cargar la imagen"+
+                                "&tipoMensaje=alert-danger ");
+                        } else {
+                            res.redirect("/publicaciones");
+                        }
+                    });
+                }
+
+            }
+        });
+    }
 
 };
 
