@@ -92,23 +92,39 @@ module.exports = function(app, swig, gestorBD) {
         if( req.query.busqueda != null ){
             criterio = { "nombre" :  {$regex : ".*"+req.query.busqueda+".*"}};
         }
+        let pg = parseInt(req.query.pg);
+        if ( req.query.pg == null){
+            pg = 1;
+        }
 
-        gestorBD.obtenerOfertas( criterio,function(ofertas) {
+        gestorBD.obtenerOfertasPg(criterio, pg , function(ofertas, total ) {
             if (ofertas == null) {
-                res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado"+
-                    "&tipoMensaje=alert-danger ");
+                res.send("Error al listar ");
             } else {
-                let respuesta = swig.renderFile('views/btienda.html',
-                    {
-                        ofertas : ofertas,
-                        user: req.session.usuario,
-                        dinero: req.session.dinero,
-                        admin: req.session.admin
-                    });
+                let ultimaPg = total/4;
+                if (total % 4 > 0 ){
+                    ultimaPg = ultimaPg+1;
+                }
+                let paginas = [];
+                for(let i = pg-2 ; i <= pg+2 ; i++){
+                    if ( i > 0 && i <= ultimaPg){
+                        paginas.push(i);
+                    }
+                }
+                let respuesta = swig.renderFile('views/btienda.html',{
+                    ofertas : ofertas,
+                    paginas : paginas,
+                    actual : pg,
+                    user: req.session.usuario,
+                    dinero: req.session.dinero,
+                    admin: req.session.admin
+                });
                 res.send(respuesta);
             }
         });
+
+
+
     });
 
     app.get('/oferta/eliminar/:id', function (req, res) {
