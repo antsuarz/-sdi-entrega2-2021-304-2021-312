@@ -37,6 +37,7 @@ module.exports = function (app, swig, gestorBD) {
                             req.session.usuario = usuario.email;
                             req.session.dinero = usuario.dinero;
                             req.session.admin = usuario.tipo;
+                            req.session.user = usuario;
                             res.redirect("/tienda");
                         }
                     });
@@ -50,7 +51,7 @@ module.exports = function (app, swig, gestorBD) {
         let respuesta = swig.renderFile('views/bregistro.html', {
             user: req.session.usuario,
             dinero: req.session.dinero,
-            admin: req.session.admin
+            admin: req.session.admin,
         });
         res.send(respuesta);
     });
@@ -125,38 +126,39 @@ module.exports = function (app, swig, gestorBD) {
     });
 
     app.get("/administrador", function (req, res) {
-        //TODO comprobar que solo administrador se puede meter en esta pagina
-        let respuesta = swig.renderFile('views/badministrador.html', {
-            user: req.session.usuario,
-            dinero: req.session.dinero,
-            admin: req.session.admin
-        });
-        res.send(respuesta);
+        if(req.session.admin == "admin") {
+            let respuesta = swig.renderFile('views/badministrador.html', {
+                user: req.session.usuario,
+                dinero: req.session.dinero,
+                admin: req.session.admin
+            });
+            res.send(respuesta);
+        }
     });
 
 
     app.get("/listaUsuarios", function (req, res) {
-        //TODO comprobar que solo administrador se puede meter en esta pagina
-        let criterio = {};
-        gestorBD.obtenerUsuarios(criterio, function (usuarios) {
-            if (usuarios == null) {
-                res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado"+
-                    "&tipoMensaje=alert-danger ");
-            } else {
-                let respuesta = swig.renderFile('views/blistausuarios.html',
-                    {
-                        usuarios: usuarios,
-                        user: req.session.usuario,
-                        dinero: req.session.dinero,
-                        admin: req.session.admin
-                    });
-                res.send(respuesta);
-            }
-        });
+        if(req.session.admin == "admin") {
+            let criterio = {};
+            gestorBD.obtenerUsuarios(criterio, function (usuarios) {
+                if (usuarios == null) {
+                    res.redirect("/tienda" +
+                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "&tipoMensaje=alert-danger ");
+                } else {
+                    let respuesta = swig.renderFile('views/blistausuarios.html',
+                        {
+                            usuarios: usuarios,
+                            user: req.session.usuario,
+                            dinero: req.session.dinero,
+                            admin: req.session.admin
+                        });
+                    res.send(respuesta);
+                }
+            });
+        }
     });
     app.post('/listaUsuarios', function (req, res) {
-
         // console.log(req.body.usuario);
         for (let i = 0; i < req.body.usuario.length; i++) {
             // console.log(req.body.usuario[i]);
@@ -164,26 +166,10 @@ module.exports = function (app, swig, gestorBD) {
             gestorBD.eliminarUsuario(criterio, function (usuarios) {
                 if (usuarios == null) {
                     res.send('Error al eliminar usuarios.');
-                } else {
-                    //si todo va bien vuelvo a cargar los datos de la pagina en vez de un redirect por seguridad
-                    let criterio = {};
-                    gestorBD.obtenerUsuarios(criterio, function (usuarios) {
-                        if (usuarios == null) {
-                            res.send("Error al listar ");
-                        } else {
-                            let respuesta = swig.renderFile('views/blistausuarios.html',
-                                {
-                                    usuarios: usuarios,
-                                    user: req.session.usuario,
-                                    dinero: req.session.dinero,
-                                    admin: req.session.admin
-                                });
-                            res.send(respuesta);
-                        }
-                    });
                 }
             });
-
+            if(i == req.body.usuario.length - 1)
+                res.redirect('/listaUsuarios');
         }
 
 
