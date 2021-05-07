@@ -24,7 +24,10 @@ app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:270
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
-
+//TODO eliminar usuarios usando checkboxes
+//TODO al comprar que se actualice el precio y se actualice de la base de datos
+//TODO validaciones de forms
+//TODO soap
 //Rutas
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rofertas.js")(app, swig, gestorBD);
