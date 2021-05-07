@@ -13,7 +13,7 @@
 
 
 <!-- Barra de Navegación superior -->
-<nav class="navbar navbar-inverse">
+<nav class="nav navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -25,24 +25,27 @@
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         {% if admin != 'admin' %}
-        <li id="mTienda" class="active"><a href="/tienda">Tienda</a></li>
+        <li id="mTienda" ><a href="/tienda"> <span class="glyphicon glyphicon-home"></span> Inicio</a></li>
         {%if user != null%}
+        <li id="mDestacadas" ><a href="/ofertas/destacadas"> <span class="glyphicon glyphicon-star"></span> Ofertas Destacadas</a></li>
 		<li id="mPublicaciones"><a href="/publicaciones">Publicaciones</a></li>
         <li id="mCompras"><a href="/compras">Compras</a></li>
+        <li id="mAgregar"><a href="/ofertas/agregar">Agregar Oferta</a></li>
         {%endif%}
         {% endif %}
         {% if admin == 'admin' %}
         <li id="mListaUsuarios"><a href="/listaUsuarios">Lista de usuarios</a></li>
         {% endif %}
-        {% if user != null && dinero !=null && admin != 'admin' %}
-        <li id="mDinero"><a >Dinero:{{dinero}}</a></li>
-        <li id="mEmail"><a>Email:{{user}}</a></li>
-        {% endif %}
+
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if user == null%}
 	    <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
         <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+        {% endif %}
+        {% if user != null && dinero !=null && admin != 'admin' %}
+        <li id="mDinero"><a>Dinero:{{dinero}} €</a></li>
+        <li id="mEmail"><a>Email:{{user}}</a></li>
         {% endif %}
         {% if user != null%}
         <li><a href="/desconectarse"><span class="glyphicon glyphicon-log-out"></span> Desconectarse</a></li>
@@ -54,6 +57,23 @@
 
 
 <div class="container">
+    <script>
+      var mensaje = getUrlParameter('mensaje');
+      var tipoMensaje = getUrlParameter('tipoMensaje');
+      if ( mensaje != ""){
+        if (tipoMensaje == "" ){
+          tipoMensaje = 'alert-info';
+        }$( ".container" )
+                .append("<div class='alert "+tipoMensaje+"'>"+mensaje+" </div>");
+      }
+      function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' :
+                decodeURIComponent(results[1].replace(/\+/g, ' '));
+      };
+    </script>
 
 	<!-- Contenido -->
     {% block contenido_principal %}

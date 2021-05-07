@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block titulo %} Ofertas Destacadas {% endblock %}
+
+{% block contenido_principal %}
+<h2>Ofertas Destacadas</h2>
+
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Detalles</th>
+            <th>Vendedor</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for oferta in ofertas %}
+        <tr>
+            <td>{{ oferta.nombre }}</td>
+            <td>{{ oferta.detalles }}</td>
+            <td>{{ oferta.autor }}</td>
+            <td>{{ oferta.precio }}</td>
+            {%if !oferta.comprado%}
+            <td>¡Oferta Disponible!
+            </td>
+            <td><a href="/oferta/comprar/{{ oferta._id.toString() }}">Comprar oferta</a></td>
+            {%else%}
+            <td>¡Oferta Vendida!</td>
+            {% endif%}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+{% endblock %}
