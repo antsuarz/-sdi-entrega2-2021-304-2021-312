@@ -20,6 +20,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import com.uniovi.tests.pageobjects.PO_DataBase;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
+import com.uniovi.tests.pageobjects.prueba;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -87,8 +88,9 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR01() {
-		System.out.println("adsdasasdsad");
-		PO_DataBase.InitMongoDB();
+		
+		PO_DataBase.showDataOfDB();
+//		PO_DataBase.InitDummyData();
 //		assertTrue("PR01 sin hacer", false);
 	}
 
