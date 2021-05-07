@@ -135,7 +135,7 @@ module.exports = function (app, swig, gestorBD) {
         });
     });
     app.post('/listaUsuarios', function (req, res) {
-
+        //TODO comprobar que solo administrador se puede meter en esta pagina
         // console.log(req.body.usuario);
         for (let i = 0; i < req.body.usuario.length; i++) {
             // console.log(req.body.usuario[i]);
