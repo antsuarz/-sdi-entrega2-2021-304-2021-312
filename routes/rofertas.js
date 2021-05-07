@@ -43,7 +43,6 @@ module.exports = function(app, swig, gestorBD) {
 
     app.post("/ofertas", function (req, res) {
 
-
         var date = new Date();
         var fechaString = date.getUTCDay() + "/" +date.getMonth() + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
         let oferta = {
@@ -52,32 +51,78 @@ module.exports = function(app, swig, gestorBD) {
             fecha: fechaString,
             autor: req.session.usuario,
             precio:req.body.precio,
-            comprado: false
+            comprado: false,
+            destacada: req.body.destacada
         }
         if (oferta.precio <= 0) {
-            res.redirect("/oferta/agregar?mensaje=El precio de la oferta debe ser superior a 0. &tipoMensaje=alert-danger");
+            res.redirect("/oferta/agregar" +
+                "?mensaje=El precio de la oferta debe ser superior a 0."+
+                "&tipoMensaje=alert-danger ");
         }
-        // Conectarse
-        gestorBD.insertarOferta(oferta, function(id){
-            if (id == null) {
-                res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado"+
-                    "&tipoMensaje=alert-danger ");
-            } else {
-                if (req.files.foto != null) {
-                    var imagen = req.files.foto;
-                    imagen.mv('public/fotos/' + id + '.png', function(err) {
-                        if (err) {
-                            res.send("Error al subir la foto");
-                        } else {
-                            res.redirect("/publicaciones");
-                        }
-                    });
-                }
+        if(oferta.destacada != null){
+            if (req.session.dinero >= 20) {
+                let dinero = {"dinero": req.session.dinero - 20};
+                req.session.dinero = dinero.dinero;
+                let usuarioId = {"_id": gestorBD.mongo.ObjectID(req.session.user._id)};
+                gestorBD.modificarDineroUsuario(usuarioId, dinero,function (id) {
+                    if (id == null) {
+                        res.redirect("/tienda" +
+                            "?mensaje=Ha ocurrido un error al modificar el dinero del usuario"+
+                            "&tipoMensaje=alert-danger ");
+                    } else {
+                        gestorBD.insertarOferta(oferta, function (id) {
+                            if (id == null) {
+                                res.redirect("/tienda" +
+                                    "?mensaje=Ha ocurrido un error inesperado" +
+                                    "&tipoMensaje=alert-danger ");
+                            } else {
+                                if (req.files.foto != null) {
+                                    var imagen = req.files.foto;
+                                    imagen.mv('public/fotos/' + id + '.png', function (err) {
+                                        if (err) {
+                                            res.send("Error al subir la foto");
+                                        } else {
+                                            res.redirect("/publicaciones");
+                                        }
+                                    });
+                                }
 
+                            }
+                        });
+                    }
+                });
+            } else {
+                res.redirect("/ofertas/agregar" +
+                    "?mensaje=No puedes comprar esta oferta"+
+                    "&tipoMensaje=alert-danger ");
             }
-        });
+        }
+        else {
+            gestorBD.insertarOferta(oferta, function (id) {
+                if (id == null) {
+                    res.redirect("/tienda" +
+                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "&tipoMensaje=alert-danger ");
+                } else {
+                    if (req.files.foto != null) {
+                        var imagen = req.files.foto;
+                        imagen.mv('public/fotos/' + id + '.png', function (err) {
+                            if (err) {
+                                res.redirect("/oferta/agregar" +
+                                    "?mensaje=Se ha producido un error al cargar la imagen"+
+                                    "&tipoMensaje=alert-danger ");
+                            } else {
+                                res.redirect("/publicaciones");
+                            }
+                        });
+                    }
+
+                }
+            });
+        }
     });
+
+
 
     app.get("/tienda", function(req, res) {
         let criterio = {};
@@ -125,7 +170,12 @@ module.exports = function(app, swig, gestorBD) {
                     "&tipoMensaje=alert-danger ");
             }
             else{
-                if(oferta[0].comprado){
+                if(oferta[0].autor == req.session.usuario){
+                    res.redirect("/tienda" +
+                        "?mensaje=No puedes comprar una oferta que tu has publicado"+
+                        "&tipoMensaje=alert-danger ");
+                }
+                else if(oferta[0].comprado){
                     res.redirect("/tienda" +
                         "?mensaje=La oferta ya fue vendida"+
                         "&tipoMensaje=alert-danger ");
@@ -159,7 +209,9 @@ module.exports = function(app, swig, gestorBD) {
                                     let dineroActual = {dinero: req.session.dinero - oferta[0].precio};
                                     gestorBD.modificarDineroUsuario(comprador,dineroActual, function (id){
                                         if (id == null) {
-                                            res.send("Error al insertar la oferta y restar el dinero");
+                                            res.redirect("/tienda" +
+                                                "?mensaje=Se ha producido un error al modificar el dinero del usuario"+
+                                                "&tipoMensaje=alert-danger ");
                                         } else {
                                             let criterio = {
                                                 email : req.session.usuario,
@@ -191,7 +243,9 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = {"usuario" : req.session.usuario};
         gestorBD.obtenerCompras(criterio, function (compras){
             if(compras == null){
-                res.send("Error al listar");
+                res.redirect("/tienda" +
+                    "?mensaje=Se ha producido un error al obtener un listado con sus compras"+
+                    "&tipoMensaje=alert-danger ");
             }
             else {
                 let ofertasCompradasIds = [];
@@ -209,6 +263,30 @@ module.exports = function(app, swig, gestorBD) {
                     });
                     res.send(respuesta);
                 });
+            }
+        });
+    })
+
+    app.get("/ofertas/destacadas", function(req,res){
+        let criterio = {"destacada" : "on" };
+        if( req.query.busqueda != null ){
+            criterio = { "nombre" :  {$regex : ".*"+req.query.busqueda+".*"}};
+        }
+
+        gestorBD.obtenerOfertas( criterio,function(ofertas) {
+            if (ofertas == null) {
+                res.redirect("/ofertas/destacadas" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
+            } else {
+                let respuesta = swig.renderFile('views/bdestacadas.html',
+                    {
+                        ofertas : ofertas,
+                        user: req.session.usuario,
+                        dinero: req.session.dinero,
+                        admin: req.session.admin
+                    });
+                res.send(respuesta);
             }
         });
     })

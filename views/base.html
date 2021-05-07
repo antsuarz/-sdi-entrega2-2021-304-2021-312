@@ -13,7 +13,7 @@
 
 
 <!-- Barra de Navegación superior -->
-<nav class="navbar navbar-inverse">
+<nav class="nav navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -25,8 +25,9 @@
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         {% if admin != 'admin' %}
-        <li id="mTienda" class="active"><a href="/tienda"> <span class="glyphicon glyphicon-home"></span> Inicio</a></li>
+        <li id="mTienda" ><a href="/tienda"> <span class="glyphicon glyphicon-home"></span> Inicio</a></li>
         {%if user != null%}
+        <li id="mDestacadas" ><a href="/ofertas/destacadas"> <span class="glyphicon glyphicon-star"></span> Ofertas Destacadas</a></li>
 		<li id="mPublicaciones"><a href="/publicaciones">Publicaciones</a></li>
         <li id="mCompras"><a href="/compras">Compras</a></li>
         <li id="mAgregar"><a href="/ofertas/agregar">Agregar Oferta</a></li>
@@ -43,7 +44,7 @@
         <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
         {% endif %}
         {% if user != null && dinero !=null && admin != 'admin' %}
-        <li id="mDinero"><a >Dinero:{{dinero}} €</a></li>
+        <li id="mDinero"><a>Dinero:{{dinero}} €</a></li>
         <li id="mEmail"><a>Email:{{user}}</a></li>
         {% endif %}
         {% if user != null%}
