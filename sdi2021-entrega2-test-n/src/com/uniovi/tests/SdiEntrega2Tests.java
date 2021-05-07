@@ -24,20 +24,6 @@ import com.uniovi.tests.pageobjects.PO_View;
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SdiEntrega2Tests {
-	// En Windows (Debe ser la versión 65.0.1 y desactivar las actualizacioens
-	// automáticas)):
-	// static String PathFirefox65 = "C:\\Program Files\\Mozilla
-	// Firefox\\firefox.exe";
-	// static String Geckdriver024 = "C:\\Path\\geckodriver024win64.exe";
-	// En MACOSX (Debe ser la versión 65.0.1 y desactivar las actualizacioens
-	// automáticas):
-//	static String PathFirefox65 = "/Applications/Firefox 2.app/Contents/MacOS/firefox-bin";
-	// static String PathFirefox64 =
-	// "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
-//	static String Geckdriver024 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver024mac";
-	// static String Geckdriver022 =
-	// "/Users/delacal/Documents/SDI1718/firefox/geckodriver023mac";
-	// Común a Windows y a MACOSX
 	
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox65\\firefox.exe";
 	static String Geckdriver024 = "C:\\geckodriver024win64.exe";
@@ -81,19 +67,19 @@ public class SdiEntrega2Tests {
 		driver.quit();
 	}
 
-	@Test
-	public void Prueba00Conexion() {
-
-		System.out.println(driver.getCurrentUrl());
-		System.out.println();
-		WebElement prueba = driver.findElement(By.id("prueba"));
-		System.out.println("-------------------");
-		System.out.println(prueba.getText());
-		assertEquals(prueba.getText(), "Wallapop App");
-
-//	WebElement we = driver.getTitle();
-
-	}
+//	@Test
+//	public void Prueba00Conexion() {
+//
+//		System.out.println(driver.getCurrentUrl());
+//		System.out.println();
+//		WebElement prueba = driver.findElement(By.id("prueba"));
+//		System.out.println("-------------------");
+//		System.out.println(prueba.getText());
+//		assertEquals(prueba.getText(), "Wallapop App");
+//
+////	WebElement we = driver.getTitle();
+//
+//	}
 	
 	
 	/**
@@ -101,6 +87,7 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR01() {
+		System.out.println("adsdasasdsad");
 		PO_DataBase.InitMongoDB();
 //		assertTrue("PR01 sin hacer", false);
 	}
