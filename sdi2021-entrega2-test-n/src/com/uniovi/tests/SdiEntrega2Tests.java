@@ -137,7 +137,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR04() {
-		assertTrue("PR04 sin hacer", false);
+		//testprueba1@gmail.com ya es anyadido antes de cada prueba
+		PO_RegisterView.registerUser(driver, "testprueba1@gmail.com", "123456");
+		//assert
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaRegistro\"]", PO_View.getTimeout());
+		//assert
+		String errMsg = "El usuario ya está registrado en la base de datos ";
+		PO_View.checkElement(driver, "text", errMsg);
+		
+		
 	}
 
 	/**
