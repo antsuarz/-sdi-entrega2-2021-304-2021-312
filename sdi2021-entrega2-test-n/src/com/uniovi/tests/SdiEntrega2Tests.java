@@ -126,7 +126,9 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR03() {
-		assertTrue("PR03 sin hacer", false);
+		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "123456", "aaaa", "Nombre", "Apellido");
+		//assert
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaRegistro\"]", PO_View.getTimeout());
 	}
 
 	/**
