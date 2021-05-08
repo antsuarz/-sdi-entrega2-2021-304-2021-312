@@ -18,9 +18,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.uniovi.tests.pageobjects.PO_DataBase;
+import com.uniovi.tests.pageobjects.PO_RegisterView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
-import com.uniovi.tests.pageobjects.prueba;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -96,7 +96,13 @@ public class SdiEntrega2Tests {
 	@Test
 	public void PR01() {
 		
-		assertTrue("PR01 sin hacer", false);
+		String email = "usarioPrueba@prueba.com";
+		String password = "123456";
+		db.deleteUser(email);
+		
+		
+		PO_RegisterView.registerUser(driver, email, password);
+		
 	}
 
 	/**

@@ -43,14 +43,24 @@ public class PO_DataBase {
 		insertOfertas();
 		insertCompras();
 	}
+	public void deleteUser(String email) {
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
+			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
+			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteOne(new Document("email", email));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
 
 	private void insertUsers() {
 //		Document{{_id=6091801ae6336f0da8899d61, email=admin@email.com, password=ebd5359e500475700c6cc3dd4af89cfd0569aa31724a1bf10ed1e3019dcfdb11, nombre=admin, apellido=admin, dinero=100, tipo=admin}}
 //		Document{{_id=6094538b2b28a92948a41acd, email=user1@email.com, password=155f8c121a9a84a039e70ed7e31c2be23125202e77c478b1a329b8e436b28df9, nombre=pepe, apellido=perez, dinero=63, tipo=noadmin}}
 		//57420b1f0b1e2d07e407a04ff8bbc205a57b3055b34ed94658c04ed38f62daa7 == prueba1
+		//6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a == 123456
 		for (int i = 0; i < 10; i++) {
 			usuarios.add(new Document("email", "testprueba" + i + "@gmail.com")
-					.append("password", "57420b1f0b1e2d07e407a04ff8bbc205a57b3055b34ed94658c04ed38f62daa7")//prueba1
+					.append("password", "6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a")//123456
 					.append("nombre", "testprueba" + i)
 					.append("apellido", "test")
 					.append("dinero", 100)
@@ -92,7 +102,7 @@ public class PO_DataBase {
 //		Document{{_id=6094f8584df7411384240f48, usuario=user3@email.com, ofertaId=Document{{_id=6094899335fe6a188c4bc076}}}}
 		for (int i = 0; i < 5; i++) {
 			compras.add(new Document()
-			.append("usuario", "Oferta" + i)
+			.append("usuario", "testprueba" + i + "@gmail.com")
 			.append("ofertaId", userIds.get(new Random().nextInt(userIds.size())))
 			.append("test", true));
 		}
