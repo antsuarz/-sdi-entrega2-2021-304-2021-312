@@ -30,6 +30,7 @@ public class SdiEntrega2Tests {
 	static String Geckdriver024 = "C:\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
+	private static PO_DataBase db ;
 
 	public static WebDriver getDriver(String PathFirefox, String Geckdriver) {
 		System.setProperty("webdriver.firefox.bin", PathFirefox);
@@ -47,11 +48,15 @@ public class SdiEntrega2Tests {
 	@Before
 	public void setUp() {
 		navigateUrl(URL, "");
+		db.InitDummyData();
+//		 db.showDataOfDB();
 	}
 	// Después de cada prueba se borran las cookies del navegador
 	@After
 	public void tearDown() {
 		driver.manage().deleteAllCookies();
+		db.ResetDummyData();
+//		 db.showDataOfDB();
 	}
 
 	@BeforeClass
@@ -59,6 +64,8 @@ public class SdiEntrega2Tests {
 		// COnfiguramos las pruebas.
 		// Fijamos el timeout en cada opción de carga de una vista. 2 segundos.
 		PO_View.setTimeout(3);
+		 db = new PO_DataBase();
+		 db.showDataOfDB();
 
 	}
 
@@ -68,19 +75,19 @@ public class SdiEntrega2Tests {
 		driver.quit();
 	}
 
-//	@Test
-//	public void Prueba00Conexion() {
-//
-//		System.out.println(driver.getCurrentUrl());
-//		System.out.println();
-//		WebElement prueba = driver.findElement(By.id("prueba"));
-//		System.out.println("-------------------");
-//		System.out.println(prueba.getText());
-//		assertEquals(prueba.getText(), "Wallapop App");
-//
-////	WebElement we = driver.getTitle();
-//
-//	}
+	@Test
+	public void Prueba00Conexion() {
+
+		System.out.println(driver.getCurrentUrl());
+		System.out.println();
+		WebElement prueba = driver.findElement(By.id("prueba"));
+		System.out.println("-------------------");
+		System.out.println(prueba.getText());
+		assertEquals(prueba.getText(), "Wallapop App");
+
+//	WebElement we = driver.getTitle();
+
+	}
 	
 	
 	/**
@@ -89,9 +96,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void PR01() {
 		
-		PO_DataBase.showDataOfDB();
-//		PO_DataBase.InitDummyData();
-//		assertTrue("PR01 sin hacer", false);
+		assertTrue("PR01 sin hacer", false);
 	}
 
 	/**
