@@ -9,8 +9,13 @@ module.exports = function(app, gestorBD) {
                     error : "se ha producido un error"
                 })
             } else {
+                let ofertasFiltradas=[]
+                for(i = 0; i < ofertas.length; i++){
+                    if(ofertas[i].autor != req.session.usuario)
+                        ofertasFiltradas.push(ofertas[i]);
+                }
                 res.status(200);
-                res.send( JSON.stringify(ofertas) );
+                res.send( JSON.stringify(ofertasFiltradas) );
             }
         });
     });
@@ -25,10 +30,10 @@ module.exports = function(app, gestorBD) {
                     error : "se ha producido un error"
                 })
             } else {
+
                 res.status(200);
-                if(ofertas[0].autor != req.body.email) {
-                    res.send(JSON.stringify(ofertas[0]));
-                }
+                res.send(JSON.stringify(ofertas));
+
             }
         });
     });
