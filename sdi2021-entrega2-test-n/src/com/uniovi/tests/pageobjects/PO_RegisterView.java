@@ -40,13 +40,18 @@ public class PO_RegisterView extends PO_NavView {
 	 * @param password
 	 */
 	public static  void registerUser(WebDriver driver, String email, String password) {
+		registerUser(driver, email, password, "Nombre", "Apellido");
+	}
+
+	public static void registerUser(WebDriver driver, String email, String password, String nombre, String apellido) {
 		// Vamos al formulario de registro
 		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
 		// Rellenamos el formulario.
-		PO_RegisterView.fillForm(driver, email , "Nombre", "Apellido", password , password);
+		PO_RegisterView.fillForm(driver, email , nombre, apellido, password , password);
 		// Comprobamos que entramos en la sección privada
 //		PO_View.checkElement(driver, "text", "testInicioSesion");
 		
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testInicioSesion\"]", PO_View.getTimeout());
+		
+		
 	}
 }

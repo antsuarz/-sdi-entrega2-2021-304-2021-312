@@ -48,6 +48,7 @@ module.exports = function (app, swig, gestorBD) {
 
 
     app.get("/registrarse", function (req, res) {
+        //TODO sacar error por pantalla al intentar registrarse
         let respuesta = swig.renderFile('views/bregistro.html', {
             user: req.session.usuario,
             dinero: req.session.dinero,

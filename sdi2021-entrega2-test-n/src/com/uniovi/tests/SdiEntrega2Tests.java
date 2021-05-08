@@ -18,9 +18,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.uniovi.tests.pageobjects.PO_DataBase;
+import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
+import com.uniovi.tests.util.SeleniumUtils;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -99,9 +101,9 @@ public class SdiEntrega2Tests {
 		String email = "usarioPrueba@prueba.com";
 		String password = "123456";
 		db.deleteUser(email);
-		
-		
 		PO_RegisterView.registerUser(driver, email, password);
+		//assert
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaTienda\"]", PO_View.getTimeout());
 		
 	}
 
@@ -111,7 +113,11 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR02() {
-		assertTrue("PR02 sin hacer", false);
+
+		PO_RegisterView.registerUser(driver, "", "", "" , "");
+		//assert
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaRegistro\"]", PO_View.getTimeout());
+		//TODO comprobar sacar error por pantalla al intentar registrarse
 	}
 
 	/**
