@@ -43,9 +43,15 @@
                 "<td>"+ofertasMostrar[i].detalles+"</td>" +
                 "<td>"+ofertasMostrar[i].precio+"</td>" +
                 "<td>"+ofertasMostrar[i].autor+"</td>" +
+                "<td><a onclick=nuevoChat('"+ofertasMostrar[i]._id+"')> Contactar</a></td>" +
                 "</tr>" );
         }
     }
     cargarOfertas();
 
+
+    function nuevoChat(id){
+        idOferta = id;
+        $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
 </script>
