@@ -27,7 +27,7 @@ public class PO_PrivateView extends PO_NavView{
 	static public void login(WebDriver driver, String email, String password) {
 
 		// Vamos al formulario de logueo.
-		PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
 		// Rellenamos el formulario
 		PO_LoginView.fillForm(driver, email, password);
 

@@ -102,7 +102,7 @@ module.exports = function (app, swig, gestorBD) {
         req.session.dinero = null;
         req.session.admin = null;
         req.session.id = null;
-        res.redirect("/tienda");
+        res.redirect("/identificarse");
     })
 
 

@@ -47,5 +47,8 @@ public class PO_NavView  extends PO_View{
 		elementos = SeleniumUtils.EsperaCargaPagina(driver, "id", textLanguage, getTimeout());
 		elementos.get(0).click();
 	}
+	public static void checkIdOnView(WebDriver driver, String id) {
+		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\""+id+"\"]", PO_View.getTimeout());
+	}
 
 }

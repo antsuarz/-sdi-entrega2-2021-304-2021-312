@@ -16,9 +16,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.uniovi.tests.pageobjects.PO_DataBase;
 import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_NavView;
 import com.uniovi.tests.pageobjects.PO_PrivateView;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
 //Paquetes con los Page Object
@@ -104,7 +107,8 @@ public class SdiEntrega2Tests {
 		db.deleteUser(email);
 		PO_RegisterView.registerUser(driver, email, password);
 		// assert
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaTienda\"]", PO_View.getTimeout());
+		PO_NavView.checkIdOnView(driver, "testVistaTienda" );
+		
 
 	}
 
@@ -118,7 +122,7 @@ public class SdiEntrega2Tests {
 
 		PO_RegisterView.registerUser(driver, "", "", "", "");
 		// assert
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaRegistro\"]", PO_View.getTimeout());
+		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
 		// TODO comprobar sacar error por pantalla al intentar registrarse
 	}
 
@@ -131,7 +135,8 @@ public class SdiEntrega2Tests {
 	public void PR03() {
 		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "123456", "aaaa", "Nombre", "Apellido");
 		// assert
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaRegistro\"]", PO_View.getTimeout());
+		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
+		
 	}
 
 	/**
@@ -143,7 +148,7 @@ public class SdiEntrega2Tests {
 		// testprueba1@gmail.com ya es anyadido antes de cada prueba
 		PO_RegisterView.registerUser(driver, "testprueba1@gmail.com", "123456");
 		// assert
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaRegistro\"]", PO_View.getTimeout());
+		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
 		// assert
 		String errMsg = "El usuario ya está registrado en la base de datos ";
 		PO_View.checkElement(driver, "text", errMsg);
@@ -160,7 +165,8 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
 		// COmprobamos que entramos en la pagina privada de Alumno
 		// assert que estamos en la pagina correcta
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaTienda\"]", PO_View.getTimeout());
+		PO_NavView.checkIdOnView(driver, "testVistaTienda");
+		
 
 	}
 
@@ -171,12 +177,12 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR06() {
-		// testprueba1@gmail.com ya es anyadido antes de cada prueba
+		// testprueba1@gmail.com ya es anyadido antes de cada prueba contrasenya 123456
 		PO_PrivateView.login(driver, "testprueba1@gmail.com", "invalida");
-		// COmprobamos que entramos en la pagina privada de Alumno
 		// assert que estamos en la pagina correcta
-		SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"testVistaIdentificacion\"]", PO_View.getTimeout());
+		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
 		// assert Algo va mal
+		//TODO igual poner un mensage mas explicativo
 		String errMsg = "Algo va mal";
 		PO_View.checkElement(driver, "text", errMsg);
 
@@ -189,7 +195,11 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR07() {
-		assertTrue("PR07 sin hacer", false);
+		//login vacio
+		PO_PrivateView.login(driver, "", "");
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
+		//TODO igual poner algun mensaje de que no puede ser en blanco
 	}
 
 	/**
@@ -199,7 +209,12 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR08() {
-		assertTrue("PR08 sin hacer", false);
+		PO_PrivateView.login(driver, "testpruebainvalido@gmail.com", "123456");
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
+		//TODO igual poner algun mensaje de que email no existe
+		String errMsg = "Algo va mal";
+		PO_View.checkElement(driver, "text", errMsg);
 	}
 
 	/**
@@ -208,7 +223,17 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR09() {
-		assertTrue("PR09 sin hacer", false);
+		//INICIO SESION PRIMERO
+		// testprueba1@gmail.com ya es anyadido antes de cada prueba
+		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
+		// COmprobamos que entramos en la pagina privada de Alumno
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testVistaTienda");
+		// Clikamos en desconectarse
+		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
+		//comprobamos que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
+		
 	}
 
 	/**
@@ -218,7 +243,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR10() {
-		assertTrue("PR10 sin hacer", false);
+		String text = "Desconectarse";
+		String busqueda = "//*[contains(text(),'" + text + "')]";
+
+		Boolean resultado;
+
+		resultado = (new WebDriverWait(driver, 2))
+				.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(busqueda)));
+
+		assertTrue(resultado);
 	}
 
 	/**
