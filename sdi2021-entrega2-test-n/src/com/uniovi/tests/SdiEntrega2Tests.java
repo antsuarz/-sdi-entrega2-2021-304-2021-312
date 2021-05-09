@@ -3,11 +3,6 @@ package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 //Paquetes JUnit 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -19,16 +14,16 @@ import org.junit.runners.MethodSorters;
 //Paquetes Selenium 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
+import com.uniovi.tests.pageobjects.PO_Compras;
 import com.uniovi.tests.pageobjects.PO_DataBase;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
-import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
 import com.uniovi.tests.pageobjects.PO_PrivateView;
 import com.uniovi.tests.pageobjects.PO_Publicaciones;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
@@ -36,7 +31,6 @@ import com.uniovi.tests.pageobjects.PO_TiendaView;
 import com.uniovi.tests.pageobjects.PO_UserListView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
-import com.uniovi.tests.util.SeleniumUtils;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -408,15 +402,14 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR17() {
+		// TODO comprobar que sea esto lo que pide
 		PO_Publicaciones.accesoPublicacionesView(driver);
 		// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
 		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
 		// comprobamos el numero de ofertas que se ven en la vista
 		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
-		
+
 	}
-
-
 
 	/**
 	 * [Prueba18] Ir a la lista de ofertas, borrar la primera oferta de la lista,
@@ -429,14 +422,12 @@ public class SdiEntrega2Tests {
 		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
 		// comprobamos el numero de ofertas que se ven en la vista
 		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
-		//establecemos el elemento a borrar
+		// establecemos el elemento a borrar
 		int numeroElemento = 0;
-		//borramos la primera oferta
-		PO_Publicaciones.eliminarElemento(driver,numeroElemento);
-		
+		// borramos la primera oferta
+		PO_Publicaciones.eliminarElemento(driver, numeroElemento);
+
 	}
-
-
 
 	/**
 	 * [Prueba19] Ir a la lista de ofertas, borrar la última oferta de la lista,
@@ -449,8 +440,8 @@ public class SdiEntrega2Tests {
 		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
 		// comprobamos el numero de ofertas que se ven en la vista
 		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
-		//borramos la ultima oferta -1 ya q el array empieza en 0
-		PO_Publicaciones.eliminarElemento(driver,numeroDeOfertas-1);
+		// borramos la ultima oferta -1 ya q el array empieza en 0
+		PO_Publicaciones.eliminarElemento(driver, numeroDeOfertas - 1);
 	}
 
 	/**
@@ -460,7 +451,14 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR20() {
-		assertTrue("PR20 sin hacer", false);
+
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		// realizamos la busqueda
+		PO_TiendaView.busquedaOferta(driver, "");
+		// Comprobamos que el usuario puede ver todas las ofertas
+		PO_TiendaView.checkUserCanSeeAllOffers(driver, db);
+
 	}
 
 	/**
@@ -470,7 +468,13 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR21() {
-		assertTrue("PR21 sin hacer", false);
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		// realizamos la busqueda
+		PO_TiendaView.busquedaOferta(driver, "dsfuyudfyfuyefiuepoo");
+		// Comprobamos que el usuario no puede ver las ofertas
+		PO_TiendaView.checkEmptyOffers(driver, db);
+
 	}
 
 	/**
@@ -481,7 +485,21 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR22() {
-		assertTrue("PR22 sin hacer", false);
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		// realizamos la busqueda mayuscula y minuscula
+		PO_TiendaView.busquedaOferta(driver, "Oferta");
+//		comprobamos que existan ofertas
+		PO_TiendaView.checkOffersMoreThan(driver, db, 0);
+		// realizamos la busqueda mayuscula y minuscula
+		PO_TiendaView.busquedaOferta(driver, "oferta");
+//		comprobamos que existan ofertas
+		PO_TiendaView.checkOffersMoreThan(driver, db, 0);
+		// realizamos la busqueda mayuscula y minuscula
+		PO_TiendaView.busquedaOferta(driver, "OFERTA");
+		// Comprobamos que el usuario no puede ver las ofertas
+		PO_TiendaView.checkEmptyOffers(driver, db);
+
 	}
 
 	/**
@@ -492,7 +510,17 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR23() {
-		assertTrue("PR23 sin hacer", false);
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		//pulsamos la oferta precio5
+		PO_TiendaView.pulsarOferta(driver, "precio5");
+//		--compramos la oferta precio5
+		PO_TiendaView.comprarOferta(driver);
+		//vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre" );
+		//comprobamos que se haya comprado
+		PO_Compras.checkItemOnList(driver,"precio5");
+
 	}
 
 	/**
@@ -503,7 +531,16 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR24() {
-		assertTrue("PR24 sin hacer", false);
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		//pulsamos la oferta precio100
+		PO_TiendaView.pulsarOferta(driver, "precio100");
+//		--compramos la oferta precio100
+		PO_TiendaView.comprarOferta(driver);
+		//vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre" );
+		//comprobamos que se haya comprado
+		PO_Compras.checkItemOnList(driver,"precio100");
 	}
 
 	/**
@@ -513,7 +550,19 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR25() {
-		assertTrue("PR25 sin hacer", false);
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		//pulsamos la oferta precio105
+		PO_TiendaView.pulsarOferta(driver, "precio105");
+//		--compramos la oferta precio105
+		PO_TiendaView.comprarOferta(driver);
+		//compruebo que sale el mensaje de error
+		String errMsg = "No tienes suficiente dinero para comprar esta oferta ";
+		PO_View.checkElement(driver, "text", errMsg);
+		//vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre" );
+		//comprobamos que se haya comprado
+		PO_Compras.checkEmptyList(driver);
 	}
 
 	/**
@@ -522,7 +571,20 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR26() {
-		assertTrue("PR26 sin hacer", false);
+		//vamos a la vista correspondiente
+		PO_Compras.accesoComprasView(driver);
+		//comprobamos que se haya comprado
+		PO_Compras.checkEmptyList(driver);
+		//creamos datos dummy para comprobar que salgan cosas
+		db.addRandomComprasTo("testprueba1@gmail.com");
+		db.showDataOfDB();
+		//nos desconectamos
+		PO_LoginView.desconectarse(driver);
+		//nos volvemos a loggear y entrar a la pagina correcta
+		PO_Compras.accesoComprasView(driver);
+		//comprobamos que la lista no este vacía
+		PO_Compras.checkComprasOnList(driver);
+		
 	}
 
 	/**

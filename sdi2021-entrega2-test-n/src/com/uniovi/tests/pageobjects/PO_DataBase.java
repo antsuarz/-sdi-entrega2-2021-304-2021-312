@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bson.Document;
+import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.WebElement;
 
 import com.mongodb.BasicDBObject;
@@ -76,13 +77,43 @@ public class PO_DataBase {
 		for (int i = 0; i < 10; i++) { // usuario
 			for (int j = 0; j < 5; j++) { // oferta
 				ofertas.add(new Document().append("nombre", "Oferta" + j)
-						.append("detalles", "Esta es la oferta numero" + j).append("fecha", new Date().toGMTString())
+						.append("detalles", "Esta es la oferta numero" + j  +  " del usuario testprueba" + i + "@gmail.com").append("fecha", new Date().toGMTString())
 						.append("autor", "testprueba" + i + "@gmail.com").append("precio", new Random().nextInt(10))
-						.append("comprado", false)
-						.append("destacada", new Random().nextBoolean() ? "on" : null).append("test", true));
+						.append("comprado", false).append("destacada", new Random().nextBoolean() ? "on" : null)
+						.append("test", true));
 			}
+			ofertas.add(new Document().append("nombre", "oferta" + 6).append("detalles", "Esta es la oferta numero" + 6 +  " del usuario testprueba" + i + "@gmail.com")
+					.append("fecha", new Date().toGMTString()).append("autor", "testprueba" + i + "@gmail.com")
+					.append("precio", new Random().nextInt(10)).append("comprado", false)
+					.append("destacada", new Random().nextBoolean() ? "on" : null).append("test", true));
 
 		}
+		ofertas.add(new Document().append("nombre", "precio5").append("detalles", "Esta es la oferta numero" + 7 +  " del usuario testprueba" + 5 + "@gmail.com")
+				.append("fecha", new Date().toGMTString()).append("autor", "testprueba" + 5 + "@gmail.com")
+				.append("precio", 5).append("comprado", false).append("destacada", null).append("test", true));
+		ofertas.add(new Document().append("nombre", "precio100").append("detalles", "Esta es la oferta numero" + 8 +  " del usuario testprueba" + 5 + "@gmail.com")
+				.append("fecha", new Date().toGMTString()).append("autor", "testprueba" + 5 + "@gmail.com")
+				.append("precio", 100).append("comprado", false).append("destacada", null).append("test", true));
+		ofertas.add(new Document().append("nombre", "precio105").append("detalles", "Esta es la oferta numero" + 9 +  " del usuario testprueba" + 5 + "@gmail.com")
+				.append("fecha", new Date().toGMTString()).append("autor", "testprueba" + 5 + "@gmail.com")
+				.append("precio", 105).append("comprado", false).append("destacada", null).append("test", true));
+		ofertas.add(new Document().append("nombre", "precio96").append("detalles", "Esta es la oferta numero" + 10 +  " del usuario testprueba" + 5 + "@gmail.com")
+				.append("fecha", new Date().toGMTString()).append("autor", "testprueba" + 5 + "@gmail.com")
+				.append("precio", 96).append("comprado", false).append("destacada", null).append("test", true));
+	}
+
+	public String getIDOferta(String nombre) {
+		// TODO Auto-generated method stub
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			FindIterable<Document> it2 = mongoclient.getDatabase(AppDBname).getCollection("ofertas")
+					.find(new Document("nombre", nombre));
+			MongoCursor<Document> cursor2 = it2.cursor();
+			while (cursor2.hasNext()) {
+				Document item2 = cursor2.next();
+				return item2.get("_id").toString();
+			}
+		}
+		return null;
 	}
 
 	private void insertCompras() {
@@ -127,7 +158,7 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("test", true));
 			for (int i = 0; i < 10; i++) {
-				String email = "testprueba" + i + "@gmail.com";//"autor" usuario
+				String email = "testprueba" + i + "@gmail.com";// "autor" usuario
 				mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
 				mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
 			}
@@ -243,10 +274,48 @@ public class PO_DataBase {
 				ofertasUsuario.add(document);
 			}
 		}
-		
+
 		return ofertasUsuario;
+
+	}
+
+	public String getIdOfertaPrecioMenorQue(int precio) {
+		List<Document> ofertas = getOfertas();
+
+		for (Document document : ofertas) {
+			int valor = (int) Double.parseDouble((String) document.get("precio"));
+			if (precio < valor) {
+				return document.get("_id").toString();
+			}
+		}
+
+		return null;
+	}
+
+	public void addRandomComprasTo(String email) {
+		List<Document> comprasRandom = new ArrayList<Document>();
+		String idUser = getIdUser(email);
+		for (int i = 0; i < 5; i++) {
+			
+			compras.add(new Document().append("usuario", email)
+					.append("ofertaId", idUser).append("test", true));
+		}
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			mongoclient.getDatabase(AppDBname).getCollection("compras").insertMany(comprasRandom);
+
+		} catch (Exception e) {
+		}
 		
-		
+	}
+
+	public String getIdUser(String email) {
+		List<Document>users = getUsers();
+		for (Document document : users) {
+			if (document.get("email").equals(email)) {
+				return document.get("_id").toString();
+			}
+		}
+		throw new InvalidArgumentException("No existe ese email");
 	}
 
 }
