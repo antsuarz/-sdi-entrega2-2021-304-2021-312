@@ -160,7 +160,7 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
     app.post('/listaUsuarios', function (req, res) {
-        // console.log(req.body.usuario);
+        console.log(req.body.usuario);
         for (let i = 0; i < req.body.usuario.length; i++) {
             // console.log(req.body.usuario[i]);
             let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};

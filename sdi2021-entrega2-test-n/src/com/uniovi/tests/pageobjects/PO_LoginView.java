@@ -20,4 +20,11 @@ public class PO_LoginView extends PO_NavView {
 		driver.findElement(boton).click();	
 	}
 
+	
+	static public void desconectarse(WebDriver driver) {
+		// Clikamos en desconectarse
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// comprobamos que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
+	}
 }

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bson.Document;
+import org.openqa.selenium.WebElement;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -43,6 +44,7 @@ public class PO_DataBase {
 		insertOfertas();
 		insertCompras();
 	}
+
 	public void deleteUser(String email) {
 		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
@@ -56,39 +58,45 @@ public class PO_DataBase {
 	private void insertUsers() {
 //		Document{{_id=6091801ae6336f0da8899d61, email=admin@email.com, password=ebd5359e500475700c6cc3dd4af89cfd0569aa31724a1bf10ed1e3019dcfdb11, nombre=admin, apellido=admin, dinero=100, tipo=admin}}
 //		Document{{_id=6094538b2b28a92948a41acd, email=user1@email.com, password=155f8c121a9a84a039e70ed7e31c2be23125202e77c478b1a329b8e436b28df9, nombre=pepe, apellido=perez, dinero=63, tipo=noadmin}}
-		//57420b1f0b1e2d07e407a04ff8bbc205a57b3055b34ed94658c04ed38f62daa7 == prueba1
-		//6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a == 123456
+		// 57420b1f0b1e2d07e407a04ff8bbc205a57b3055b34ed94658c04ed38f62daa7 == prueba1
+		// 6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a == 123456
 		for (int i = 0; i < 10; i++) {
 			usuarios.add(new Document("email", "testprueba" + i + "@gmail.com")
-					.append("password", "6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a")//123456
-					.append("nombre", "testprueba" + i)
-					.append("apellido", "test")
-					.append("dinero", 100)
+					.append("password", "6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a")// 123456
+					.append("nombre", "testprueba" + i).append("apellido", "test").append("dinero", 100)
 					.append("test", true));
 		}
 	}
 
 	@SuppressWarnings("deprecation")
 	private void insertOfertas() {
-		//Document{{_id=609479cc4b44d8342879cc99, nombre=Oferta 1, detalles=Esta es la oferta número 1, fecha=4/4/2021 Hora: 1:20, autor=user1@email.com, precio=6, comprado=true, destacada=null}}
-		for (int i = 0; i < 10; i++) { //usuario
-			for (int j = 0; j < 5 ; j++) { //oferta
-				ofertas.add(new Document()
-								.append("nombre", "Oferta" + j)
-								.append("detalles", "Esta es la oferta número" + j)
-								.append("fecha", new Date().toGMTString())
-								.append("autor", "testprueba" + i + "@gmail.com")
-								.append("precio", new Random().nextInt(10))
-								.append("comprado", new Random().nextBoolean())
-								.append("destacada", new Random().nextBoolean()?"on":null)
-								.append("test", true));
+		// Document{{_id=609479cc4b44d8342879cc99, nombre=Oferta 1, detalles=Esta es la
+		// oferta nï¿½mero 1, fecha=4/4/2021 Hora: 1:20, autor=user1@email.com, precio=6,
+		// comprado=true, destacada=null}}
+		for (int i = 0; i < 10; i++) { // usuario
+			for (int j = 0; j < 5; j++) { // oferta
+				ofertas.add(new Document().append("nombre", "Oferta" + j)
+						.append("detalles", "Esta es la oferta nï¿½mero" + j).append("fecha", new Date().toGMTString())
+						.append("autor", "testprueba" + i + "@gmail.com").append("precio", new Random().nextInt(10))
+						.append("comprado", new Random().nextBoolean())
+						.append("destacada", new Random().nextBoolean() ? "on" : null).append("test", true));
 			}
-			
+
 		}
 	}
 
 	private void insertCompras() {
-		
+
+		List<Document> userIds = getUsersIds();
+
+//		Document{{_id=6094f8584df7411384240f48, usuario=user3@email.com, ofertaId=Document{{_id=6094899335fe6a188c4bc076}}}}
+		for (int i = 0; i < 5; i++) {
+			compras.add(new Document().append("usuario", "testprueba" + i + "@gmail.com")
+					.append("ofertaId", userIds.get(new Random().nextInt(userIds.size()))).append("test", true));
+		}
+	}
+
+	private List<Document> getUsersIds() {
 		List<Document> userIds = new ArrayList<Document>();
 		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
 			FindIterable<Document> it2 = mongoclient.getDatabase(AppDBname).getCollection("usuarios").find();
@@ -97,15 +105,8 @@ public class PO_DataBase {
 				Document item2 = cursor2.next();
 				userIds.add(new Document("_id", item2.get("_id")));
 			}
-	}
-
-//		Document{{_id=6094f8584df7411384240f48, usuario=user3@email.com, ofertaId=Document{{_id=6094899335fe6a188c4bc076}}}}
-		for (int i = 0; i < 5; i++) {
-			compras.add(new Document()
-			.append("usuario", "testprueba" + i + "@gmail.com")
-			.append("ofertaId", userIds.get(new Random().nextInt(userIds.size())))
-			.append("test", true));
 		}
+		return userIds;
 	}
 
 	public void InitDummyData() {
@@ -133,11 +134,11 @@ public class PO_DataBase {
 
 	public void showDataOfDB() {
 		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
-	
+
 		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
 			List<String> databases = mongoclient.listDatabaseNames().into(new ArrayList<>());
 			System.out.println("databases" + databases);
-	
+
 			List<String> collectionNames = mongoclient.getDatabase(AppDBname).listCollectionNames()
 					.into(new ArrayList<>());
 			System.out.println("collectionNames" + collectionNames);
@@ -153,14 +154,14 @@ public class PO_DataBase {
 					System.out.println(item2);
 				}
 			}
-	
+
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 	}
 
 	private static void prueba() {
-	
+
 		/* Step-1 > Connect to MongoDB */
 		System.out.println("Step-1 > Connect to MongoDB");
 		MongoClient mongoClient = MongoClients.create(connectionString);
@@ -168,42 +169,84 @@ public class PO_DataBase {
 		// If in case database doesn't exists, it will be created at runtime
 		System.out.println("Step-2 > Connect to DATABASE");
 		MongoDatabase db = mongoClient.getDatabase(AppDBname);
-	
+
 		/* Step-3 > Get the COLLECTION (TABLE) */
 		// If in case collection (Table) doesn't exists, it will be created at runtime
 		System.out.println("Step-3 > Get the COLLECTION (TABLE)");
 		DBCollection dbCollection = (DBCollection) db.getCollection("usuarios");
-	
+
 		/*
 		 * Step-4 > Not Mandatory If collection already exists, you may remove
 		 * everything from collection for perfect OUTPUT of program
 		 */
 		System.out.println("Step-4 > Not Mandatory");
 		dbCollection.remove(new BasicDBObject());
-	
+
 		BasicDBObject basicDBObject1 = new BasicDBObject();
 		basicDBObject1.put("id", 1); // Id is the column name, 1 is the value of column
 		basicDBObject1.put("name", "Ankit");
-	
+
 		/* Step5 > INSERT document1/record1 in COLLECTION in MongoDB */
 		System.out.println("Step-5 > INSERT document1/record1 in COLLECTION in MongoDB");
 		dbCollection.insert(basicDBObject1);
-	
+
 		BasicDBObject basicDBObject2 = new BasicDBObject();
 		basicDBObject2.put("id", 2); // Id is the column name, 2 is the value of column
 		basicDBObject2.put("name", "Sam");
-	
+
 		/* Step-6 > INSERT document2/record2 in COLLECTION in MongoDB */
 		System.out.println("Step-6 > INSERT document1/record1 in COLLECTION in MongoDB");
 		dbCollection.insert(basicDBObject2);
-	
+
 		/** Step-7 > Display documents of COLLECTION in MongoDB */
 		System.out.println("Step-7 > Display documents of COLLECTION in MongoDB");
 		DBCursor dbCursor = dbCollection.find();
 		while (dbCursor.hasNext()) {
 			System.out.println(dbCursor.next());
 		}
-	
+
+	}
+
+	public List<Document> getUsers() {
+		return getCollection("usuarios");
+	}
+
+	public List<Document> getOfertas() {
+		return getCollection("ofertas");
+	}
+
+	public List<Document> getCompras() {
+		return getCollection("compras");
+	}
+
+	public List<Document> getCollection(String collection) {
+		List<Document> tmp = new ArrayList<Document>();
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			FindIterable<Document> it2 = mongoclient.getDatabase(AppDBname).getCollection(collection).find();
+			MongoCursor<Document> cursor2 = it2.cursor();
+			while (cursor2.hasNext()) {
+				Document item2 = cursor2.next();
+				tmp.add(item2);
+			}
+		}
+		return tmp;
+	}
+
+	public List<Document> getOfertasUser(String email) {
+
+		List<Document> ofertas = getOfertas();
+		List<Document> ofertasUsuario = new ArrayList<Document>();
+		for (Document document : ofertas) {
+			System.out.println(document);
+			System.out.println(document.get("autor"));
+			if (email.equals(document.get("autor"))) {
+				ofertasUsuario.add(document);
+			}
+		}
+		
+		return ofertasUsuario;
+		
+		
 	}
 
 }

@@ -3,6 +3,9 @@ package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.util.List;
+
 //Paquetes JUnit 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -21,9 +24,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.uniovi.tests.pageobjects.PO_DataBase;
 import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
+import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
 import com.uniovi.tests.pageobjects.PO_PrivateView;
+import com.uniovi.tests.pageobjects.PO_Publicaciones;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
+import com.uniovi.tests.pageobjects.PO_UserListView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
 import com.uniovi.tests.util.SeleniumUtils;
@@ -72,7 +79,8 @@ public class SdiEntrega2Tests {
 		// Fijamos el timeout en cada opción de carga de una vista. 2 segundos.
 		PO_View.setTimeout(3);
 		db = new PO_DataBase();
-		db.showDataOfDB();
+		// DEBUG mostrar los datos de la Base de datos
+//		db.showDataOfDB();
 
 	}
 
@@ -107,8 +115,7 @@ public class SdiEntrega2Tests {
 		db.deleteUser(email);
 		PO_RegisterView.registerUser(driver, email, password);
 		// assert
-		PO_NavView.checkIdOnView(driver, "testVistaTienda" );
-		
+		PO_NavView.checkIdOnView(driver, "testVistaTienda");
 
 	}
 
@@ -136,7 +143,7 @@ public class SdiEntrega2Tests {
 		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "123456", "aaaa", "Nombre", "Apellido");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
-		
+
 	}
 
 	/**
@@ -166,7 +173,6 @@ public class SdiEntrega2Tests {
 		// COmprobamos que entramos en la pagina privada de Alumno
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaTienda");
-		
 
 	}
 
@@ -182,7 +188,7 @@ public class SdiEntrega2Tests {
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
 		// assert Algo va mal
-		//TODO igual poner un mensage mas explicativo
+		// TODO igual poner un mensage mas explicativo
 		String errMsg = "Algo va mal";
 		PO_View.checkElement(driver, "text", errMsg);
 
@@ -195,11 +201,11 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR07() {
-		//login vacio
+		// login vacio
 		PO_PrivateView.login(driver, "", "");
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
-		//TODO igual poner algun mensaje de que no puede ser en blanco
+		// TODO igual poner algun mensaje de que no puede ser en blanco
 	}
 
 	/**
@@ -212,7 +218,7 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.login(driver, "testpruebainvalido@gmail.com", "123456");
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
-		//TODO igual poner algun mensaje de que email no existe
+		// TODO igual poner algun mensaje de que email no existe
 		String errMsg = "Algo va mal";
 		PO_View.checkElement(driver, "text", errMsg);
 	}
@@ -223,17 +229,17 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR09() {
-		//INICIO SESION PRIMERO
+		// INICIO SESION PRIMERO
 		// testprueba1@gmail.com ya es anyadido antes de cada prueba
 		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
 		// COmprobamos que entramos en la pagina privada de Alumno
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaTienda");
 		// Clikamos en desconectarse
-		PO_HomeView.clickOption(driver, "identificarse", "class", "btn btn-primary");
-		//comprobamos que estamos en la pagina correcta
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "btn btn-primary");
+		// comprobamos que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
-		
+
 	}
 
 	/**
@@ -243,7 +249,7 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR10() {
-		String text = "Desconectarse";
+		String text = "Inicio";
 		String busqueda = "//*[contains(text(),'" + text + "')]";
 
 		Boolean resultado;
@@ -260,7 +266,16 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR11() {
-		assertTrue("PR11 sin hacer", false);
+		// nos metemos en la vista adecuada
+		PO_UserListView.accesoUserList(driver);
+		// comprobamos que el numero de usuarios coincida con los que hay registrados en
+		// la base de datos
+		int usersDB = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDB--;
+		// realizo el asserto
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDB);
+
 	}
 
 	/**
@@ -269,7 +284,26 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR12() {
-		assertTrue("PR12 sin hacer", false);
+
+		// vamos a la lista de usuarios
+		PO_UserListView.accesoUserList(driver);
+		// comprobamos que el numero de usuarios coincida con los que hay registrados en
+		// la base de datos
+		int usersDBpreBorrado = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDBpreBorrado--;
+		// estado inicial correcto
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
+		// borro el usuario colocado arriba del todo en la lista
+		PO_UserListView.deleteUser(driver, 0);
+		// vuelvo a sacar en este momento los usuarios de la base de datos
+		int usersDBpostBorrado = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDBpostBorrado--;
+		// asserto de la base de datos
+		assertEquals(usersDBpreBorrado - 1, usersDBpostBorrado);
+		// asserto de la web
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpostBorrado);
 	}
 
 	/**
@@ -278,7 +312,25 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR13() {
-		assertTrue("PR13 sin hacer", false);
+		// vamos a la lista de usuarios
+		PO_UserListView.accesoUserList(driver);
+		// comprobamos que el numero de usuarios coincida con los que hay registrados en
+		// la base de datos
+		int usersDBpreBorrado = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDBpreBorrado--;
+		// estado inicial correcto
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
+		// borro el usuario colocado arriba del todo en la lista
+		PO_UserListView.deleteUser(driver, usersDBpreBorrado);
+		// vuelvo a sacar en este momento los usuarios de la base de datos
+		int usersDBpostBorrado = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDBpostBorrado--;
+		// asserto de la base de datos
+		assertEquals(usersDBpreBorrado - 1, usersDBpostBorrado);
+		// asserto de la web
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpostBorrado);
 	}
 
 	/**
@@ -287,7 +339,25 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR14() {
-		assertTrue("PR14 sin hacer", false);
+		// vamos a la lista de usuarios
+		PO_UserListView.accesoUserList(driver);
+		// comprobamos que el numero de usuarios coincida con los que hay registrados en
+		// la base de datos
+		int usersDBpreBorrado = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDBpreBorrado--;
+		// estado inicial correcto
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
+		// borro el usuario colocado arriba del todo en la lista
+		PO_UserListView.deleteUser(driver, 0, 1, usersDBpreBorrado);
+		// vuelvo a sacar en este momento los usuarios de la base de datos
+		int usersDBpostBorrado = db.getUsers().size();
+		// le resto 1 por que el admin no se encuentra en esa lista
+		usersDBpostBorrado--;
+		// asserto de la base de datos
+		assertEquals(usersDBpreBorrado - 1, usersDBpostBorrado);
+		// asserto de la web
+		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpostBorrado);
 	}
 
 	/**
@@ -297,7 +367,20 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR15() {
-		assertTrue("PR15 sin hacer", false);
+		// entramos en la pagina adecuada
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver);
+		// rellenamos el formulario
+		PO_AgregarOfertasView.fillForm(driver, "OfertaTestNombre", "OfertaTestDetalles", "1", ".\\img\\caratula.jpg",
+				false);
+		// nos desconectamos
+		PO_LoginView.desconectarse(driver);
+		// nos metemos en /publicaciones
+		PO_Publicaciones.accesoPublicacionesView(driver);
+		// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
+		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
+		// comprobamos el numero de ofertas que se ven en la vista
+		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
+
 	}
 
 	/**
@@ -307,7 +390,13 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR16() {
-		assertTrue("PR16 sin hacer", false);
+		// entramos en la pagina adecuada
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver);
+		// rellenamos el formulario
+		PO_AgregarOfertasView.fillForm(driver, "", "OfertaTestDetalles", "-1", ".\\img\\caratula.jpg", false);
+		// comprobamos que seguimos en la misma pagina
+		PO_NavView.checkIdOnView(driver, "testVistaOfertasAgregar");
+
 	}
 
 	/**
@@ -316,7 +405,25 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR17() {
-		assertTrue("PR17 sin hacer", false);
+//		nos loggeamos
+		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
+		// COmprobamos que entramos en la pagina privada de Alumno
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testVistaTienda");
+		// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
+		int numeroDeOfertasUsuario = PO_Publicaciones.getOfertas(db);
+		// calculamos las ofertas para ese usuario
+		int numeroOfertasParaElUsuario = db.getOfertas().size() - numeroDeOfertasUsuario;
+		//iniciamos un contador para ir contando ofertas
+		int contador = 0;
+		
+		List<WebElement> ofertasPagina = SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"oferta\"]",PO_View.getTimeout());
+		contador += ofertasPagina.size();
+		System.out.println(contador);
+		List<WebElement> botonesPaginacion = SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@class=\"page-link\"]",PO_View.getTimeout());
+		System.out.println(botonesPaginacion.size());
+		botonesPaginacion.get(0).click();
+		
 	}
 
 	/**

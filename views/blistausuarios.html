@@ -25,7 +25,7 @@
             <td>{{ usuario.apellido }}</td>
             <td>{{ usuario.email }}</td>
             <td><label>
-                <input name="usuario" type="checkbox" id="{{ usuario._id.toString() }}" value="{{ usuario._id.toString() }}" for="usuario">
+                <input class="deleteCheckbox" name="usuario" type="checkbox" id="{{ usuario._id.toString() }}" value="{{ usuario._id.toString() }}" for="usuario">
             </label> <br>
             </td>
         </tr>
@@ -34,7 +34,7 @@
         </tbody>
     </table>
         <div class="row text-right">
-            <button class="btn btn-danger"  type="submit" > Eliminar Usuarios </button>
+            <button id="deleteButton" class="btn btn-danger"  type="submit" > Eliminar Usuarios </button>
 <!--            id="btnDelete"  class="btn btn-danger" role="button" onclick="getSelectedCheckboxValues('usuario')"-->
         </div>
     </form>
