@@ -1,0 +1,97 @@
+<div id="widget-conversaciones" >
+    <h4>Conversaciones de ofertas que te interesan</h4>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Vendedor</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaComprar">
+        </tbody>
+    </table>
+    <h4>Conversaciones de posibles compradores</h4>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Comprador</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaVender">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var conversacionesCompra;
+    var conversacionesVenta;
+    function cargarConversacionesComprar(){
+        $.ajax({
+            url: URLbase + "/conversaciones/comprar",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                conversacionesCompra = respuesta;
+                actualizarTablaCompra(conversacionesCompra);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    function cargarConversacionesVender(){
+        $.ajax({
+            url: URLbase + "/conversaciones/vender",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                conversacionesVenta = respuesta;
+                actualizarTablaVenta(conversacionesVenta);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+
+    function actualizarTablaCompra(conversaciones){
+
+        $("#tablaComprar").empty();
+        for (i = 0; i < conversaciones.length; i++) {
+            $("#tablaComprar").append(
+                "<tr id=" + conversaciones[i]._id + ">" +
+                "<td>" + conversaciones[i].oferta + "</td>" +
+                "<td> " + conversaciones[i].vendedor + ":</td>" +
+                "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+"')> Contactar</a></td>" +
+                "</tr>");
+            }
+    }
+
+    function actualizarTablaVenta(conversaciones){
+
+        $("#tablaVender").empty();
+        for (i = 0; i < conversaciones.length; i++) {
+            $("#tablaVender").append(
+                "<tr id=" + conversaciones[i]._id + ">" +
+                "<td>" + conversaciones[i].oferta + "</td>" +
+                "<td> " + conversaciones[i].comprador + ":</td>" +
+                "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+ "','"+conversaciones[i].comprador+ "')> Contactar</a></td>" +
+                "</tr>");
+        }
+    }
+
+    function nuevoChat(id, comprador){
+        idOferta = id;
+        emailComprador = comprador;
+        $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
+    cargarConversacionesComprar();
+    cargarConversacionesVender();
+</script>
