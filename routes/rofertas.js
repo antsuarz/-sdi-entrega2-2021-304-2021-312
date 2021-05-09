@@ -117,7 +117,8 @@ module.exports = function(app, swig, gestorBD) {
                     actual : pg,
                     user: req.session.usuario,
                     dinero: req.session.dinero,
-                    admin: req.session.admin
+                    admin: req.session.admin,
+                    ultimaPg: ultimaPg
                 });
                 res.send(respuesta);
             }

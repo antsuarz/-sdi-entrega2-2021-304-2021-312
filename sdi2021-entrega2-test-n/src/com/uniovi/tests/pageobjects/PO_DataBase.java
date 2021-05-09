@@ -237,8 +237,6 @@ public class PO_DataBase {
 		List<Document> ofertas = getOfertas();
 		List<Document> ofertasUsuario = new ArrayList<Document>();
 		for (Document document : ofertas) {
-			System.out.println(document);
-			System.out.println(document.get("autor"));
 			if (email.equals(document.get("autor"))) {
 				ofertasUsuario.add(document);
 			}

@@ -4,8 +4,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.uniovi.tests.util.SeleniumUtils;
 
@@ -35,4 +38,25 @@ public class PO_Publicaciones {
 		
 	}
 
+	public static void eliminarElemento(WebDriver driver, int numeroElemento) {
+		List<WebElement> elementos = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"btnEliminar\"]",
+				PO_View.getTimeout());
+
+		WebElement primeraOfertaBtnEliminar = elementos.get(numeroElemento);
+		String href = primeraOfertaBtnEliminar.getAttribute("href");
+		primeraOfertaBtnEliminar.click();
+		
+		 Boolean resultado = (new WebDriverWait(driver, PO_View.getTimeout()))
+				.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[@href=\""+href+"\"]")));
+
+		assertTrue(resultado);
+		
+		List<WebElement> elementosactualizados = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"btnEliminar\"]",
+				PO_View.getTimeout());
+		
+		assertTrue(elementos.size() > elementosactualizados.size());
+		
+		
+	}
+	
 }

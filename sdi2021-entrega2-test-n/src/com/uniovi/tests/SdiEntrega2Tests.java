@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 //Paquetes JUnit 
 import org.junit.After;
@@ -30,6 +32,7 @@ import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
 import com.uniovi.tests.pageobjects.PO_PrivateView;
 import com.uniovi.tests.pageobjects.PO_Publicaciones;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
+import com.uniovi.tests.pageobjects.PO_TiendaView;
 import com.uniovi.tests.pageobjects.PO_UserListView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
@@ -405,26 +408,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR17() {
-//		nos loggeamos
-		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
-		// COmprobamos que entramos en la pagina privada de Alumno
-		// assert que estamos en la pagina correcta
-		PO_NavView.checkIdOnView(driver, "testVistaTienda");
+		PO_Publicaciones.accesoPublicacionesView(driver);
 		// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
-		int numeroDeOfertasUsuario = PO_Publicaciones.getOfertas(db);
-		// calculamos las ofertas para ese usuario
-		int numeroOfertasParaElUsuario = db.getOfertas().size() - numeroDeOfertasUsuario;
-		//iniciamos un contador para ir contando ofertas
-		int contador = 0;
-		
-		List<WebElement> ofertasPagina = SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"oferta\"]",PO_View.getTimeout());
-		contador += ofertasPagina.size();
-		System.out.println(contador);
-		List<WebElement> botonesPaginacion = SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@class=\"page-link\"]",PO_View.getTimeout());
-		System.out.println(botonesPaginacion.size());
-		botonesPaginacion.get(0).click();
+		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
+		// comprobamos el numero de ofertas que se ven en la vista
+		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
 		
 	}
+
+
 
 	/**
 	 * [Prueba18] Ir a la lista de ofertas, borrar la primera oferta de la lista,
@@ -432,8 +424,19 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR18() {
-		assertTrue("PR18 sin hacer", false);
+		PO_Publicaciones.accesoPublicacionesView(driver);
+		// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
+		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
+		// comprobamos el numero de ofertas que se ven en la vista
+		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
+		//establecemos el elemento a borrar
+		int numeroElemento = 0;
+		//borramos la primera oferta
+		PO_Publicaciones.eliminarElemento(driver,numeroElemento);
+		
 	}
+
+
 
 	/**
 	 * [Prueba19] Ir a la lista de ofertas, borrar la última oferta de la lista,

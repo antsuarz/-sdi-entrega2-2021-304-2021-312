@@ -25,7 +25,7 @@
 				<td>No</td>
 				{% endif%}
 				{%if !oferta.comprado%}
-				<td><a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
+				<td><a id="btnEliminar" href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
 			    </td>
 				{%else%}
 				<td>¡Oferta Vendida!</td>
