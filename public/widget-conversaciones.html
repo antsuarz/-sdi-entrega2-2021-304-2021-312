@@ -28,6 +28,8 @@
 <script>
     var conversacionesCompra;
     var conversacionesVenta;
+
+    //carga la lista de conversaciones en las que nosotros somos el comprador
     function cargarConversacionesComprar(){
         $.ajax({
             url: URLbase + "/conversaciones/comprar",
@@ -44,6 +46,7 @@
             }
         });
     }
+    //carga la lista de conversaciones en las que nosotros somos el vendedor
     function cargarConversacionesVender(){
         $.ajax({
             url: URLbase + "/conversaciones/vender",
@@ -60,7 +63,7 @@
             }
         });
     }
-
+    //actualiza la tabla de compras
     function actualizarTablaCompra(conversaciones){
 
         $("#tablaComprar").empty();
@@ -70,10 +73,11 @@
                 "<td>" + conversaciones[i].oferta + "</td>" +
                 "<td> " + conversaciones[i].vendedor + ":</td>" +
                 "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+"')> Contactar</a></td>" +
+                "<td><a onclick=eliminarConversacion('" + conversaciones[i]._id + "')>Eliminar</a></td>" +
                 "</tr>");
             }
     }
-
+    //actualiza la tabla de ventas
     function actualizarTablaVenta(conversaciones){
 
         $("#tablaVender").empty();
@@ -83,14 +87,33 @@
                 "<td>" + conversaciones[i].oferta + "</td>" +
                 "<td> " + conversaciones[i].comprador + ":</td>" +
                 "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+ "','"+conversaciones[i].comprador+ "')> Contactar</a></td>" +
+                "<td><a onclick=eliminarConversacion('" + conversaciones[i]._id + "')>Eliminar</a></td>" +
                 "</tr>");
         }
     }
-
+    //Crea un nuevo chat
+    //Esta funcion pasa el email del comprador a la pantalla de chat, para asi poder cargar todos los mensajes de las conversaciones adecuadas
     function nuevoChat(id, comprador){
         idOferta = id;
         emailComprador = comprador;
         $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
+
+    //Elimina una conversación, y con ella, todos los mensajes que contiene
+    function eliminarConversacion(id){
+        idConversacion = id;
+        $.ajax({
+            url: URLbase + "/conversaciones/" + id,
+            type: "DELETE",
+            dataType: 'json',
+            headers: { "token": token },
+            success : function(){
+                $( "#contenedor-principal" ).load("widget-conversaciones.html");
+            },
+            error : function(){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
     }
     cargarConversacionesComprar();
     cargarConversacionesVender();

@@ -22,6 +22,7 @@
 
 <script>
     var mensajes;
+    //Funcion que carga los mensajes de un determinado chat
     function cargarMensajes(){
         $.ajax({
             url: URLbase + "/mensaje/" +idOferta + "/" + emailComprador,
@@ -39,7 +40,7 @@
             }
         });
     }
-
+    //Funcion que actualiza los mensajes que salen en la tabla de determinado chat
     function actualizarTabla(mensajesMostrar){
         $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
         for (i = 0; i < mensajesMostrar.length; i++) {
@@ -51,6 +52,7 @@
                 "</tr>" );
         }
     }
+    //Funcion que se ejecuta al clicar el boton para enviar un mensaje, envia el mensaje
     $("#boton-enviar").click(function(){
         $.ajax({
             url: URLbase + "/mensaje/agregar/"+ idOferta + "/" + emailComprador,
@@ -62,6 +64,7 @@
             success : function(respuesta){
                 actualizarTabla(respuesta);
                 cargarMensajes();
+                //Limpia el formulario despues de un mensaje
                 $('input[type="text"]').val('');
 
             },
@@ -72,9 +75,6 @@
         });
     });
 
-    function limpiarFormulario() {
-        document.getElementById("contenido").reset();
-    }
 
     cargarMensajes();
 </script>

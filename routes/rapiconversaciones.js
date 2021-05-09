@@ -27,6 +27,42 @@ module.exports = function (app, gestorBD) {
     });
 
 
+    //Función que elimina conversaciones de la base de datos, y todos los mensajes asociados a ella
+    app.delete("/api/conversaciones/:id", function(req, res) {
+        let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) }
+        let criterioMsg = {"conversacion" : gestorBD.mongo.ObjectID(req.params.id) }
+
+        gestorBD.eliminarConversacion(criterio,function(conversaciones){
+            if(conversaciones.length == 0)
+                console.log(cagaste);
+            if ( conversaciones == null ){
+                res.status(500);
+                res.json({
+                    error : "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.send( JSON.stringify(conversaciones) );
+            }
+        });
+        gestorBD.eliminarMensajes(criterioMsg,function(mensajes){
+            if(mensajes.length == 0)
+                console.log(cagaste);
+            if ( mensajes == null ){
+                res.status(500);
+                res.json({
+                    error : "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.send( JSON.stringify(mensajes) );
+            }
+        });
+
+
+
+    });
+
 
 
 }
