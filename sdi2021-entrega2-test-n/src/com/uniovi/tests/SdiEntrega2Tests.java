@@ -444,7 +444,13 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR19() {
-		assertTrue("PR19 sin hacer", false);
+		PO_Publicaciones.accesoPublicacionesView(driver);
+		// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
+		int numeroDeOfertas = PO_Publicaciones.getOfertas(db);
+		// comprobamos el numero de ofertas que se ven en la vista
+		PO_Publicaciones.checkNumberOfPublicacionesOnList(driver, numeroDeOfertas);
+		//borramos la ultima oferta -1 ya q el array empieza en 0
+		PO_Publicaciones.eliminarElemento(driver,numeroDeOfertas-1);
 	}
 
 	/**

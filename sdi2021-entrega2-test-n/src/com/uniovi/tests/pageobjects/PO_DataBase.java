@@ -76,9 +76,9 @@ public class PO_DataBase {
 		for (int i = 0; i < 10; i++) { // usuario
 			for (int j = 0; j < 5; j++) { // oferta
 				ofertas.add(new Document().append("nombre", "Oferta" + j)
-						.append("detalles", "Esta es la oferta n�mero" + j).append("fecha", new Date().toGMTString())
+						.append("detalles", "Esta es la oferta numero" + j).append("fecha", new Date().toGMTString())
 						.append("autor", "testprueba" + i + "@gmail.com").append("precio", new Random().nextInt(10))
-						.append("comprado", new Random().nextBoolean())
+						.append("comprado", false)
 						.append("destacada", new Random().nextBoolean() ? "on" : null).append("test", true));
 			}
 
@@ -117,7 +117,6 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("compras").insertMany(compras);
 
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 
 	}
@@ -127,8 +126,12 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("test", true));
+			for (int i = 0; i < 10; i++) {
+				String email = "testprueba" + i + "@gmail.com";//"autor" usuario
+				mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
+				mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
+			}
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 	}
 
@@ -156,7 +159,6 @@ public class PO_DataBase {
 			}
 
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 	}
 
