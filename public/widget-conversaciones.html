@@ -26,6 +26,7 @@
 </div>
 
 <script>
+    actualizar = false;
     var conversacionesCompra;
     var conversacionesVenta;
 
@@ -70,7 +71,7 @@
         for (i = 0; i < conversaciones.length; i++) {
             $("#tablaComprar").append(
                 "<tr id=" + conversaciones[i]._id + ">" +
-                "<td>" + conversaciones[i].oferta + "</td>" +
+                "<td>" + conversaciones[i].oferta.nombre + "</td>" +
                 "<td> " + conversaciones[i].vendedor + ":</td>" +
                 "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+"')> Contactar</a></td>" +
                 "<td><a onclick=eliminarConversacion('" + conversaciones[i]._id + "')>Eliminar</a></td>" +
@@ -84,7 +85,7 @@
         for (i = 0; i < conversaciones.length; i++) {
             $("#tablaVender").append(
                 "<tr id=" + conversaciones[i]._id + ">" +
-                "<td>" + conversaciones[i].oferta + "</td>" +
+                "<td>" + conversaciones[i].oferta.nombre + "</td>" +
                 "<td> " + conversaciones[i].comprador + ":</td>" +
                 "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+ "','"+conversaciones[i].comprador+ "')> Contactar</a></td>" +
                 "<td><a onclick=eliminarConversacion('" + conversaciones[i]._id + "')>Eliminar</a></td>" +

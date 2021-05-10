@@ -17,8 +17,10 @@
 </div>
 
 <script>
+    cargarOfertas();
+    actualizar = false;
     var ofertas;
-    //Funcion que carga las ofertas
+
     function cargarOfertas(){
         $.ajax({
             url: URLbase + "/oferta",
@@ -57,6 +59,7 @@
     function nuevoChat(id){
         idOferta = id;
         emailComprador = undefined;
+        actualizar = true;
         $( "#contenedor-principal" ).load( "widget-chat.html");
     }
 </script>

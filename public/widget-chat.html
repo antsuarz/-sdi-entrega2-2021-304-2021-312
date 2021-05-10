@@ -1,6 +1,6 @@
 <div id="widget-chat" >
     <table class="table table-hover">
-        <tbody id="tablaCuerpo">
+        <tbody id="tablaMensajes">
         </tbody>
     </table>
 </div>
@@ -20,6 +20,7 @@
 
 
 <script>
+    actualizar = true;
     var mensajes;
     //Funcion que carga los mensajes de un determinado chat
     function cargarMensajes(){
@@ -35,15 +36,16 @@
                 actualizarTabla(mensajes);
             },
             error : function (error){
+                actualizar= false;
                 $( "#contenedor-principal" ).load("widget-login.html");
             }
         });
     }
     //Funcion que actualiza los mensajes que salen en la tabla de determinado chat
     function actualizarTabla(mensajesMostrar){
-        $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
+        $( "#tablaMensajes" ).empty(); // Vaciar la tabla
         for (i = 0; i < mensajesMostrar.length; i++) {
-            $( "#tablaCuerpo" ).append(
+            $( "#tablaMensajes" ).append(
                 "<tr id="+mensajesMostrar[i]._id+">"+
                 "<td> "+mensajesMostrar[i].emisor+":</td>" +
                 "<td>"+mensajesMostrar[i].contenido+"</td>" +
@@ -69,9 +71,15 @@
             },
         });
     });
-
-    //TODO setInterval para cargar los mensajes
     cargarMensajes();
+
+    function actualizacion(){
+        if(actualizar){
+            cargarMensajes();
+        }
+    }
+    setInterval('actualizacion()', 2000);
+
 
 
 

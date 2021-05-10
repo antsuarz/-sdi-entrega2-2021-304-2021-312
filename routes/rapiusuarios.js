@@ -1,6 +1,8 @@
 module.exports = function(app, gestorBD) {
 
-    //Función que autentica a un usuario en la aplicacion, comprueba si esta en la base de datos, si es asi, marca al usuario como autenticado.
+    /**
+     * Función que autentica a un usuario en la aplicacion, comprueba si esta en la base de datos, si es asi, marca al usuario como autenticado.
+     */
     app.post("/api/autenticar", function(req,res){
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
         let criterio= {
@@ -56,7 +58,11 @@ module.exports = function(app, gestorBD) {
         })
     });
 
-
+    /**
+     * Función que valida los datos introducidos en el formulario de registro de usuario
+     * @param usuario, usuario a validar
+     * @param funcionCallback, funcion que mostrará los errores por pantalla
+     */
     function validaDatosUsuario(usuario, funcionCallback) {
         let errors = new Array();
         if (usuario.email === null || typeof usuario.email === 'undefined' ||
