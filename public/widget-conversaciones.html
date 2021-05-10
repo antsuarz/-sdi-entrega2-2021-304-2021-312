@@ -1,0 +1,120 @@
+<div id="widget-conversaciones" >
+    <h4>Conversaciones de ofertas que te interesan</h4>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Vendedor</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaComprar">
+        </tbody>
+    </table>
+    <h4>Conversaciones de posibles compradores</h4>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Comprador</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaVender">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var conversacionesCompra;
+    var conversacionesVenta;
+
+    //carga la lista de conversaciones en las que nosotros somos el comprador
+    function cargarConversacionesComprar(){
+        $.ajax({
+            url: URLbase + "/conversaciones/comprar",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                conversacionesCompra = respuesta;
+                actualizarTablaCompra(conversacionesCompra);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    //carga la lista de conversaciones en las que nosotros somos el vendedor
+    function cargarConversacionesVender(){
+        $.ajax({
+            url: URLbase + "/conversaciones/vender",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(respuesta) {
+                conversacionesVenta = respuesta;
+                actualizarTablaVenta(conversacionesVenta);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    //actualiza la tabla de compras
+    function actualizarTablaCompra(conversaciones){
+
+        $("#tablaComprar").empty();
+        for (i = 0; i < conversaciones.length; i++) {
+            $("#tablaComprar").append(
+                "<tr id=" + conversaciones[i]._id + ">" +
+                "<td>" + conversaciones[i].oferta + "</td>" +
+                "<td> " + conversaciones[i].vendedor + ":</td>" +
+                "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+"')> Contactar</a></td>" +
+                "<td><a onclick=eliminarConversacion('" + conversaciones[i]._id + "')>Eliminar</a></td>" +
+                "</tr>");
+            }
+    }
+    //actualiza la tabla de ventas
+    function actualizarTablaVenta(conversaciones){
+
+        $("#tablaVender").empty();
+        for (i = 0; i < conversaciones.length; i++) {
+            $("#tablaVender").append(
+                "<tr id=" + conversaciones[i]._id + ">" +
+                "<td>" + conversaciones[i].oferta + "</td>" +
+                "<td> " + conversaciones[i].comprador + ":</td>" +
+                "<td><a onclick=nuevoChat('"+conversaciones[i].oferta._id+ "','"+conversaciones[i].comprador+ "')> Contactar</a></td>" +
+                "<td><a onclick=eliminarConversacion('" + conversaciones[i]._id + "')>Eliminar</a></td>" +
+                "</tr>");
+        }
+    }
+    //Crea un nuevo chat
+    //Esta funcion pasa el email del comprador a la pantalla de chat, para asi poder cargar todos los mensajes de las conversaciones adecuadas
+    function nuevoChat(id, comprador){
+        idOferta = id;
+        emailComprador = comprador;
+        $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
+
+    //Elimina una conversación, y con ella, todos los mensajes que contiene
+    function eliminarConversacion(id){
+        idConversacion = id;
+        $.ajax({
+            url: URLbase + "/conversaciones/" + id,
+            type: "DELETE",
+            dataType: 'json',
+            headers: { "token": token },
+            success : function(){
+                $( "#contenedor-principal" ).load("widget-conversaciones.html");
+            },
+            error : function(){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    cargarConversacionesComprar();
+    cargarConversacionesVender();
+</script>

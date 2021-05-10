@@ -1,4 +1,6 @@
 module.exports = function(app, gestorBD) {
+
+    //Función que autentica a un usuario en la aplicacion, comprueba si esta en la base de datos, si es asi, marca al usuario como autenticado.
     app.post("/api/autenticar", function(req,res){
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
         let criterio= {
