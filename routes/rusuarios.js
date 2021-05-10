@@ -86,31 +86,46 @@ module.exports = function (app, swig, gestorBD) {
      * Dependiendo si el usuario está registrado como administrador, o como usuario normal, muestra la tienda, o la vista de administrador.
      */
     app.post("/identificarse", function (req, res) {
-        let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
-            .update(req.body.password).digest('hex');
-        let criterio = {
-            email: req.body.email,
-            password: seguro
-        }
-        gestorBD.obtenerUsuarios(criterio, function (usuarios) {
-            if (usuarios == null || usuarios.length == 0) {
-                res.redirect("/identificarse" +
-                    "?mensaje=El usuario no se ha encontrado en la base de datos"+
-                    "&tipoMensaje=alert-danger ");
-            } else {
-                req.session.usuario = usuarios[0].email;
-                req.session.dinero = usuarios[0].dinero;
-                req.session.admin = usuarios[0].tipo;
-                req.session.user = usuarios[0];
-                if(usuarios[0].tipo == "admin"){
 
-                    res.redirect("/administrador");
-                } else {
-                    res.redirect("/tienda");
-                }
-
+        if(validarCamposIdentificarse(req.body.email, req.body.password, res)) {
+            let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
+                .update(req.body.password).digest('hex');
+            let criterio = {
+                email: req.body.email,
+                password: seguro
             }
-        });
+            gestorBD.obtenerUsuarios(criterio, function (usuarios) {
+                if (usuarios == null || usuarios.length == 0) {
+                    criterioEmail ={
+                        email: req.body.email,
+                    }
+                    gestorBD.obtenerUsuarios(criterioEmail, function (uspass) {
+                        if(uspass == null || uspass.length == 0) {
+                            res.redirect("/identificarse" +
+                                "?mensaje=El usuario no se ha encontrado en la base de datos" +
+                                "&tipoMensaje=alert-danger ");
+                        }
+                        else{
+                            res.redirect("/identificarse" +
+                                "?mensaje=La contraseña no coincide con la del usuario identificado" +
+                                "&tipoMensaje=alert-danger ");
+                        }
+                    });
+                } else {
+                    req.session.usuario = usuarios[0].email;
+                    req.session.dinero = usuarios[0].dinero;
+                    req.session.admin = usuarios[0].tipo;
+                    req.session.user = usuarios[0];
+                    if (usuarios[0].tipo == "admin") {
+
+                        res.redirect("/administrador");
+                    } else {
+                        res.redirect("/tienda");
+                    }
+
+                }
+            });
+        }
     });
 
     /**
@@ -365,5 +380,30 @@ module.exports = function (app, swig, gestorBD) {
         }
         else
             return true;
+    }
+
+    /**
+     * Función que valida los campos del formulario de identificación de usuario.
+     * @param email, email del usuario
+     * @param password, contraseña del usuario
+     * @param res
+     * @returns true, si los campos son correctos, false, si no lo son
+     */
+    function validarCamposIdentificarse(email, password, res){
+        if(email == ""){
+            res.redirect("/identificarse" +
+                "?mensaje=El campo email no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+            return false;
+        }
+        else if(password == ""){
+            res.redirect("/identificarse" +
+                "?mensaje=El campo contraseña no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 };
