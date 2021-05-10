@@ -1,12 +1,11 @@
 module.exports = function (app, swig, gestorBD) {
-    app.get("/usuarios", function (req, res) {
-        res.send("ver usuarios");
-    });
 
+    //Función que te redirige a la ventana de login por defecto
     app.get('/', function (req, res) {
         res.redirect("/identificarse");
     });
 
+    //Función que inserta un usuario en la base de datos, comprobando antes si ya existe en esta
     app.post('/usuario', function (req, res) {
         if (req.body.password != req.body.rePassword) {
             res.redirect("/registrarse");
@@ -46,7 +45,7 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-
+    //Función encargada de mostrar el formulario de registro
     app.get("/registrarse", function (req, res) {
         //TODO sacar error por pantalla al intentar registrarse
         let respuesta = swig.renderFile('views/bregistro.html', {
@@ -58,6 +57,7 @@ module.exports = function (app, swig, gestorBD) {
     });
 
 
+    //Función encargada de mostrar el formulario de identificación
     app.get("/identificarse", function (req, res) {
 
         swig.renderFile('views/base.html', {usuario: req.session.usuario});
@@ -69,6 +69,8 @@ module.exports = function (app, swig, gestorBD) {
         res.send(respuesta);
     });
 
+    //Función encargada de identificar un usuario en la base de datos, para ello comprueba si el usuario está registrado previamente
+    //Dependiendo si el usuario está registrado como administrador, o como usuario normal, muestra la tienda, o la vista de administrador
     app.post("/identificarse", function (req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -79,7 +81,7 @@ module.exports = function (app, swig, gestorBD) {
         gestorBD.obtenerUsuarios(criterio, function (usuarios) {
             if (usuarios == null || usuarios.length == 0) {
                 res.redirect("/identificarse" +
-                    "?mensaje=Algo va mal"+
+                    "?mensaje=El usuario no se ha encontrado en la base de datos"+
                     "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0].email;
@@ -97,6 +99,7 @@ module.exports = function (app, swig, gestorBD) {
         });
     });
 
+    //Función que desconecta un usuario de la aplicación
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         req.session.dinero = null;
@@ -105,27 +108,30 @@ module.exports = function (app, swig, gestorBD) {
         res.redirect("/identificarse");
     })
 
-
+    //Función que obtiene las ofertas que ha publicado el usuario de sesión
     app.get("/publicaciones", function (req, res) {
-        let criterio = {autor: req.session.usuario};
-        gestorBD.obtenerOfertas(criterio, function (ofertas) {
-            if (ofertas == null) {
-                res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado"+
-                    "&tipoMensaje=alert-danger ");
-            } else {
-                let respuesta = swig.renderFile('views/bpublicaciones.html',
-                    {
-                        ofertas: ofertas,
-                        user: req.session.usuario,
-                        dinero: req.session.dinero,
-                        admin: req.session.admin
-                    });
-                res.send(respuesta);
-            }
-        });
+        if(req.session.usuario != null) {
+            let criterio = {autor: req.session.usuario};
+            gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                if (ofertas == null) {
+                    res.redirect("/tienda" +
+                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "&tipoMensaje=alert-danger ");
+                } else {
+                    let respuesta = swig.renderFile('views/bpublicaciones.html',
+                        {
+                            ofertas: ofertas,
+                            user: req.session.usuario,
+                            dinero: req.session.dinero,
+                            admin: req.session.admin
+                        });
+                    res.send(respuesta);
+                }
+            });
+        }
     });
 
+    //Función encargada de mostrar la vista de administrador de la aplicación
     app.get("/administrador", function (req, res) {
         if(req.session.admin == "admin") {
             let respuesta = swig.renderFile('views/badministrador.html', {
@@ -137,7 +143,7 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-
+    //Función que muestra la lista de usuarios registrados en la base de datos
     app.get("/listaUsuarios", function (req, res) {
         if(req.session.admin == "admin") {
             let criterio = {};
@@ -159,20 +165,34 @@ module.exports = function (app, swig, gestorBD) {
             });
         }
     });
+
+  //Función que elimina uno o varios usuarios de la base de datos
     app.post('/listaUsuarios', function (req, res) {
         console.log(req.body.usuario);
-        for (let i = 0; i < req.body.usuario.length; i++) {
-            // console.log(req.body.usuario[i]);
-            let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
-            gestorBD.eliminarUsuario(criterio, function (usuarios) {
-                if (usuarios == null) {
-                    res.send('Error al eliminar usuarios.');
+        if(req.body.usuario != null && req.body.usuario.length > 0) {
+            if (req.body.usuario[0].length == 1) {
+                let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario)};
+                gestorBD.eliminarUsuario(criterio, function (usuarios) {
+                    if (usuarios == null) {
+                        res.send('Error al eliminar usuarios.');
+                    }else{
+                        res.redirect('/listaUsuarios');
+                    }
+                });
+            } else {
+                for (let i = 0; i < req.body.usuario.length; i++) {
+                    console.log(req.body.usuario[i]);
+
+                    let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
+                    gestorBD.eliminarUsuario(criterio, function (usuarios) {
+                        if (usuarios == null) {
+                            res.send('Error al eliminar usuarios.');
+                        }
+                    });
+                    if (i == req.body.usuario.length - 1)
+                        res.redirect('/listaUsuarios');
                 }
-            });
-            if(i == req.body.usuario.length - 1)
-                res.redirect('/listaUsuarios');
+            }
         }
-
-
     });
 };

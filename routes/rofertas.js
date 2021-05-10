@@ -1,7 +1,7 @@
 module.exports = function(app, swig, gestorBD) {
+
+    //Funcion que inicializa la ventana tienda
     app.get("/ofertas", function(req, res) {
-
-
         let respuesta = swig.renderFile('views/btienda.html', {
             user: req.session.usuario,
             admin: req.session.admin,
@@ -10,6 +10,9 @@ module.exports = function(app, swig, gestorBD) {
         });
         res.send(respuesta);
     });
+
+    //Funcion para agregar nuevas ofertas,
+    //te reenvia a un formulario para introducir los datos
     app.get('/ofertas/agregar', function (req, res) {
 
         let respuesta = swig.renderFile('views/bagregar.html', {
@@ -20,7 +23,7 @@ module.exports = function(app, swig, gestorBD) {
         res.send(respuesta);
     })
 
-
+    //Funcion para mostrar una oferta en concreto segun un id
     app.get('/oferta/:id', function (req, res) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) };
         gestorBD.obtenerOfertas(criterio,function(ofertas){
@@ -41,6 +44,8 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
+    //Funcion que inserta una nueva oferta en la base de datos a traves de los datos recogidos de un formulario
+    //Se encarga tambien de verificar que los datos son correctos
     app.post("/ofertas", function (req, res) {
 
         var date = new Date();
@@ -54,10 +59,23 @@ module.exports = function(app, swig, gestorBD) {
             comprado: false,
             destacada: req.body.destacada
         }
+        if(oferta.nombre.length < 5){
+            res.redirect("/tienda" +
+                "?mensaje=El nombre de la oferta es demasiado corto (debe ser superior a 5)."+
+                "&tipoMensaje=alert-danger ");
+            return;
+        }
         if (oferta.precio <= 0) {
-            res.redirect("/oferta/agregar" +
+            res.redirect("/tienda" +
                 "?mensaje=El precio de la oferta debe ser superior a 0."+
                 "&tipoMensaje=alert-danger ");
+            return;
+        }
+        if (oferta.detalles.length < 8) {
+            res.redirect("/tienda" +
+                "?mensaje=Los detalles de la oferta deben contener al menos 8 caracteres"+
+                "&tipoMensaje=alert-danger ");
+            return;
         }
         if(oferta.destacada != null){
             if (req.session.dinero >= 20) {
@@ -70,7 +88,7 @@ module.exports = function(app, swig, gestorBD) {
                             "?mensaje=Ha ocurrido un error al modificar el dinero del usuario"+
                             "&tipoMensaje=alert-danger ");
                     } else {
-                        insertarUsuarioBD(oferta, req ,res);
+                        insertarOfertaBD(oferta, req ,res);
                     }
                 });
             } else {
@@ -80,13 +98,12 @@ module.exports = function(app, swig, gestorBD) {
             }
         }
         else {
-            insertarUsuarioBD(oferta, req, res);
+            insertarOfertaBD(oferta, req, res);
         }
     });
 
 
-
-
+    //Funcion que carga la tienda, gestiona la busqueda y la paginación
     app.get("/tienda", function(req, res) {
         let criterio = {};
         if( req.query.busqueda != null ){
@@ -127,11 +144,9 @@ module.exports = function(app, swig, gestorBD) {
                 res.send(respuesta);
             }
         });
-
-
-
     });
 
+    //Funcion que elimina una determinada oferta de la base de datos
     app.get('/oferta/eliminar/:id', function (req, res) {
         let criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
         gestorBD.eliminarOferta(criterio,function(ofertas){
@@ -145,6 +160,9 @@ module.exports = function(app, swig, gestorBD) {
         });
     })
 
+    //Función para comprar una determinada oferta
+    //Antes de comprar, comprueba la disponibilidad de la oferta, si el comprador no es el autor de esta, y si este tiene suficiente dinero para adquirirla
+    //Modifica la oferta, inserta la compra en la base de datos, modifica el valor del dinero del usuario comprador, y actualiza el valor del dinero que se muestra en la interfaz
     app.get('/oferta/comprar/:id', function (req, res) {
         let ofertaId = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.obtenerOfertas(ofertaId, function(oferta){
@@ -223,6 +241,7 @@ module.exports = function(app, swig, gestorBD) {
         })
     });
 
+    //Funcion que obtiene las ofertas que un usuario ha comprado, y las muestra.
     app.get("/compras", function(req,res){
         //TODO comprobar no poder entrar sin estar loggeado
         let criterio = {"usuario" : req.session.usuario};
@@ -252,6 +271,7 @@ module.exports = function(app, swig, gestorBD) {
         });
     })
 
+    //Funcion que obtiene todas las ofertas destacadas del sistema
     app.get("/ofertas/destacadas", function(req,res){
         let criterio = {"destacada" : "on" };
         if( req.query.busqueda != null ){
@@ -276,28 +296,18 @@ module.exports = function(app, swig, gestorBD) {
         });
     })
 
-    function insertarUsuarioBD(oferta, req, res){
-        gestorBD.insertarOferta(oferta, function (id) {
-            if (id == null) {
-                res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado" +
-                    "&tipoMensaje=alert-danger ");
-            } else {
-                if (req.files.foto != null) {
-                    var imagen = req.files.foto;
-                    imagen.mv('public/fotos/' + id + '.png', function (err) {
-                        if (err) {
-                            res.redirect("/oferta/agregar" +
-                                "?mensaje=Se ha producido un error al cargar la imagen"+
-                                "&tipoMensaje=alert-danger ");
-                        } else {
-                            res.redirect("/publicaciones");
-                        }
-                    });
-                }
+    //Funcion que inserta una oferta en la base de datos
+    function insertarOfertaBD(oferta, req, res){
+            gestorBD.insertarOferta(oferta, function (id) {
+                if (id == null) {
+                    res.redirect("/tienda" +
+                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "&tipoMensaje=alert-danger ");
+                } else {
+                    res.redirect("/publicaciones");
 
-            }
-        });
+                }
+            });
     }
 
 };
