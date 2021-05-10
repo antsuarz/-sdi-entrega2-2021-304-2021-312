@@ -22,19 +22,13 @@ import com.mongodb.client.MongoIterable;
 
 public class PO_DataBase {
 
-//	private static int port = 8081;
-	// antonio
 	private static String connectionString = "mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:27017,tiendamusica-shard-00-01.jxgw2.mongodb.net:27017,tiendamusica-shard-00-02.jxgw2.mongodb.net:27017/myWallapop?ssl=true&replicaSet=atlas-od6pn1-shard-0&authSource=admin&retryWrites=true&w=majority";
-//	private static String clave = "abcdefg";
-//	private static String crypto = "crypto";
 	private static String AppDBname = "myWallapop";
 	private static List<Document> usuarios = new ArrayList<Document>();
 	private static List<Document> ofertas = new ArrayList<Document>();
 	private static List<Document> compras = new ArrayList<Document>();
-	// pablo
 
 	public PO_DataBase() {
-		// TODO Auto-generated constructor stub
 		insertUsers();
 		insertOfertas();
 		insertCompras();
@@ -46,7 +40,6 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteOne(new Document("email", email));
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 	}
 

@@ -123,7 +123,7 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR02() {
-
+		
 		PO_RegisterView.registerUser(driver, "", "", "", "");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
@@ -140,7 +140,7 @@ public class SdiEntrega2Tests {
 		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "123456", "aaaa", "Nombre", "Apellido");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
-
+		//TODO mensaje conraseña invalida
 	}
 
 	/**
