@@ -298,18 +298,7 @@ module.exports = function(app, swig, gestorBD) {
                         "?mensaje=Ha ocurrido un error inesperado" +
                         "&tipoMensaje=alert-danger ");
                 } else {
-                    if (req.files.foto != null) {
-                        var imagen = req.files.foto;
-                        imagen.mv('public/fotos/' + id + '.png', function (err) {
-                            if (err) {
-                                res.redirect("/oferta/agregar" +
-                                    "?mensaje=Se ha producido un error al cargar la imagen" +
-                                    "&tipoMensaje=alert-danger ");
-                            } else {
-                                res.redirect("/publicaciones");
-                            }
-                        });
-                    }
+                    res.redirect("/publicaciones");
 
                 }
             });

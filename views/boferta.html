@@ -3,15 +3,16 @@
 {% block titulo %} Detalles de la oferta {{ oferta.nombre }}{% endblock %}
 
 {% block contenido_principal %}
+
 	 <div class="row">
 		<div class="media col-xs-10">
-		  <div class="media-left media-middle">
-			<img class="media-object" src="/fotos/{{ oferta._id.toString() }}.png"  >
-		  </div>
 		  <div class="media-body">
 			 <h2>{{oferta.nombre}}</h2>
-			 <p>{{oferta.autor}}</p>
-			 <p>{{oferta.detalles}}</p>
+			 <p>Propietario : {{oferta.autor}}</p>
+			  <div>
+				  <h4>Detalles:</h4>
+				  <p>{{oferta.detalles}}</p>
+			  </div>
 			  <p>{{oferta.fecha}}</p>
 			 <a type="button" class="btn btn-primary pull-right" href="/oferta/comprar/{{oferta._id.toString()}}">{{oferta.precio}} €</a>
 		  </div>
