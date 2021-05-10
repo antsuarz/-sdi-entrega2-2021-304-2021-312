@@ -25,24 +25,26 @@ module.exports = function(app, gestorBD) {
     });
 
     /**
-     * Funcion que obtiene ofertas de la base de datos segun un id pasado
+     * Funcion que obtiene ofertas de la base de datos según un id
      */
     app.get("/api/oferta/:id", function(req, res) {
-        let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
+        if(autenticado) {
+            let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)}
 
-        gestorBD.obtenerOfertas(criterio,function(ofertas){
-            if ( ofertas == null ){
-                res.status(500);
-                res.json({
-                    error : "se ha producido un error"
-                })
-            } else {
+            gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                if (ofertas == null) {
+                    res.status(500);
+                    res.json({
+                        error: "se ha producido un error"
+                    })
+                } else {
 
-                res.status(200);
-                res.send(JSON.stringify(ofertas));
+                    res.status(200);
+                    res.send(JSON.stringify(ofertas));
 
-            }
-        });
+                }
+            });
+        }
     });
 
     /**
@@ -108,7 +110,6 @@ module.exports = function(app, gestorBD) {
                         error: "No se ha podido generar el listado"
                     })
                 } else if (lista.length == 0) {
-                    console.log("insertando nueva conversación")
                     insertarConversacionBD(criterio, req, res);
                 } else {
                     let mensajeNuevo = {
@@ -164,8 +165,6 @@ module.exports = function(app, gestorBD) {
                         res.json({ error: "No se ha podido generar el listado"})
                     }
                     else if(lista.length == 0){
-
-                        console.log("No hay conversación")
                         res.status(200);
                         res.send(JSON.stringify(new Array()));
                     }
@@ -215,7 +214,7 @@ module.exports = function(app, gestorBD) {
                 let conversacion = {
                     "vendedor": ofertas[0].autor,
                     "comprador": req.session.usuario,
-                    "oferta": oferta
+                    "oferta": ofertas[0]
                 }
                 gestorBD.insertarConversacion(conversacion, function (conv) {
                     if ( conv == null ) {

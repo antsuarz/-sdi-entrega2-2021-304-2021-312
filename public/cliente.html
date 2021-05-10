@@ -40,15 +40,18 @@
 <script>
     let token;
     let URLbase = "https://localhost:8081/api";
+    let autenticado = false;
     $( "#contenedor-principal" ).load( "widget-login.html");
 
     function widgetOfertas(){
         actualizar = false;
-        $( "#contenedor-principal" ).load( "widget-ofertas.html");
+        if(autenticado)
+            $( "#contenedor-principal" ).load( "widget-ofertas.html");
     }
     function widgetConversaciones(){
         actualizar = false;
-        $( "#contenedor-principal" ).load( "widget-conversaciones.html");
+        if(autenticado)
+            $( "#contenedor-principal" ).load( "widget-conversaciones.html");
     }
 </script>
 </body>

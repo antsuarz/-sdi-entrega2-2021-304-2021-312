@@ -34,6 +34,7 @@
             success : function(respuesta){
                 console.log(respuesta.token);
                 token = respuesta.token;
+                autenticado = true;
                 $("#contenedor-principal").load("widget-ofertas.html");
             },
             //Funcion que notifica los posibles errores encontrados al rellenar el formulario de login
