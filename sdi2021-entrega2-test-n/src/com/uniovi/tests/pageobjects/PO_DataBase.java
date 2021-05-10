@@ -1,6 +1,5 @@
 package com.uniovi.tests.pageobjects;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,17 +9,13 @@ import java.util.logging.Logger;
 
 import org.bson.Document;
 import org.openqa.selenium.InvalidArgumentException;
-import org.openqa.selenium.WebElement;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -37,7 +32,6 @@ public class PO_DataBase {
 	private static List<Document> ofertas = new ArrayList<Document>();
 	private static List<Document> compras = new ArrayList<Document>();
 	// pablo
-//	private static String connectionString = "mongodb://admin:sdi@tiendamusica-shard-00-00.any5v.mongodb.net:27017,tiendamusica-shard-00-01.any5v.mongodb.net:27017,tiendamusica-shard-00-02.any5v.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-exyqcf-shard-0&authSource=admin&retryWrites=true&w=majority";
 
 	public PO_DataBase() {
 		// TODO Auto-generated constructor stub
