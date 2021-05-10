@@ -31,7 +31,8 @@ app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
 //TODO validaciones de forms
-//TODO soap
+//TODO logger
+
 //Rutas
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rofertas.js")(app, swig, gestorBD);

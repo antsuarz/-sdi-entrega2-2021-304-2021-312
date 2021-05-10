@@ -243,32 +243,32 @@ module.exports = function(app, swig, gestorBD) {
 
     //Funcion que obtiene las ofertas que un usuario ha comprado, y las muestra.
     app.get("/compras", function(req,res){
-        //TODO comprobar no poder entrar sin estar loggeado
-        let criterio = {"usuario" : req.session.usuario};
-        gestorBD.obtenerCompras(criterio, function (compras){
-            if(compras == null){
-                res.redirect("/tienda" +
-                    "?mensaje=Se ha producido un error al obtener un listado con sus compras"+
-                    "&tipoMensaje=alert-danger ");
-            }
-            else {
-                let ofertasCompradasIds = [];
-                for(i=0; i < compras.length; i++){
-                    ofertasCompradasIds.push(compras[i].ofertaId._id);
-                }
+        if(req.session.usuario != null) {
+            let criterio = {"usuario": req.session.usuario};
+            gestorBD.obtenerCompras(criterio, function (compras) {
+                if (compras == null) {
+                    res.redirect("/tienda" +
+                        "?mensaje=Se ha producido un error al obtener un listado con sus compras" +
+                        "&tipoMensaje=alert-danger ");
+                } else {
+                    let ofertasCompradasIds = [];
+                    for (i = 0; i < compras.length; i++) {
+                        ofertasCompradasIds.push(compras[i].ofertaId._id);
+                    }
 
-                let criterio = {"_id" : {$in: ofertasCompradasIds}}
-                gestorBD.obtenerOfertas(criterio, function (ofertas){
-                    let respuesta = swig.renderFile('views/bcompras.html', {
-                        ofertas : ofertas,
-                        user: req.session.usuario,
-                        dinero: req.session.dinero,
-                        admin: req.session.admin
+                    let criterio = {"_id": {$in: ofertasCompradasIds}}
+                    gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                        let respuesta = swig.renderFile('views/bcompras.html', {
+                            ofertas: ofertas,
+                            user: req.session.usuario,
+                            dinero: req.session.dinero,
+                            admin: req.session.admin
+                        });
+                        res.send(respuesta);
                     });
-                    res.send(respuesta);
-                });
-            }
-        });
+                }
+            });
+        }
     })
 
     //Funcion que obtiene todas las ofertas destacadas del sistema
