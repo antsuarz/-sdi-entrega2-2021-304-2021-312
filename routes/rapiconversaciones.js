@@ -46,8 +46,6 @@ module.exports = function (app, gestorBD) {
             }
         });
         gestorBD.eliminarMensajes(criterioMsg,function(mensajes){
-            if(mensajes.length == 0)
-                console.log(cagaste);
             if ( mensajes == null ){
                 res.status(500);
                 res.json({

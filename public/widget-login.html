@@ -36,9 +36,21 @@
                 token = respuesta.token;
                 $("#contenedor-principal").load("widget-ofertas.html");
             },
+            //Funcion que notifica los posibles errores encontrados al rellenar el formulario de login
             error : function(error){
-                $("#widget-login")
-                    .prepend("<div class='alert alert-danger'>Usuario no identificado</div>");
+                $("#div-errores").remove();
+                let errores = error.responseJSON.errores;
+                if (errores != null && errores.length>0){
+                    $("#widget-login")
+                        .prepend("<div id = 'div-errores' class='alert alert-danger'><ul id = 'ul-errores'></ul></div>");
+                    for (let i = 0; i < errores.length; i++) {
+                        $("#ul-errores").append("<li >"+ errores[i] + "</li>");
+                    }
+                } else {
+                    $("#widget-login")
+                        .prepend("<div id = 'div-errores' class='alert alert-danger'>El usuario introducido no se encuentra en la base de datos</div>");
+                }
+
             }
         });
     });

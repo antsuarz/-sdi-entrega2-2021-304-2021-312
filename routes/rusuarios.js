@@ -8,7 +8,9 @@ module.exports = function (app, swig, gestorBD) {
     //Función que inserta un usuario en la base de datos, comprobando antes si ya existe en esta
     app.post('/usuario', function (req, res) {
         if (req.body.password != req.body.rePassword) {
-            res.redirect("/registrarse");
+            res.redirect("/registrarse"+
+                "?mensaje=La contraseña no se ha repetido correctamente"+
+                "&tipoMensaje=alert-danger ");
         } else {
             let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest('hex');
@@ -172,6 +174,7 @@ module.exports = function (app, swig, gestorBD) {
         if(req.body.usuario != null && req.body.usuario.length > 0) {
             if (req.body.usuario[0].length == 1) {
                 let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario)};
+                eliminarTodoReferenteUsuarios(req.body.usuario,req,res);
                 gestorBD.eliminarUsuario(criterio, function (usuarios) {
                     if (usuarios == null) {
                         res.send('Error al eliminar usuarios.');
@@ -181,18 +184,78 @@ module.exports = function (app, swig, gestorBD) {
                 });
             } else {
                 for (let i = 0; i < req.body.usuario.length; i++) {
-                    console.log(req.body.usuario[i]);
+
 
                     let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
+                    eliminarTodoReferenteUsuarios(req.body.usuario, req, res);
                     gestorBD.eliminarUsuario(criterio, function (usuarios) {
                         if (usuarios == null) {
                             res.send('Error al eliminar usuarios.');
                         }
                     });
-                    if (i == req.body.usuario.length - 1)
+                    if (i == req.body.usuario.length - 1) {
                         res.redirect('/listaUsuarios');
+                    }
+
                 }
             }
         }
     });
+
+    function eliminarTodoReferenteUsuarios(usuarios, req, res){
+        if (usuarios[0].length == 1) {
+            console.log(usuarios);
+            eliminarUsuarioBD(usuarios, req, res);
+        }
+        else{
+            for(i = 0; i < usuarios.length; i++){
+                eliminarUsuarioBD(usuarios[i], req, res);
+            }
+        }
+    }
+
+    function eliminarUsuarioBD(user, req, res){
+        let criterio={
+            "_id": gestorBD.mongo.ObjectID(user.toString())
+        }
+        gestorBD.obtenerUsuarios(criterio, function (usuario){
+            if(usuario == null || usuario.length == 0){
+                console.log("F");
+            }
+            else{
+                let criterioEliminarOfertas={
+                    "autor": usuario[0].email
+                }
+                let criterioEliminarConversacionesComprar={
+                    "comprador": usuario[0].email
+                }
+                let criterioEliminarConversacionesVender={
+                    "vendedor": usuario[0].email
+                }
+                let criterioEliminarMensajes={
+                    "emisor": usuario[0].email
+                }
+                gestorBD.eliminarOferta(criterioEliminarOfertas, function (ofertas){
+                    if(ofertas == null){
+                        res.send('Error al borrar ofertas.');
+                    }
+                })
+                gestorBD.eliminarConversacion(criterioEliminarConversacionesComprar, function (converComp){
+                    if(converComp == null){
+                        res.send('Error al borrar conversaciones de compra.');
+                    }
+                })
+                gestorBD.eliminarConversacion(criterioEliminarConversacionesVender, function (converVen){
+                    if(converVen == null){
+                        res.send('Error al borrar conversaciones de venta.');
+                    }
+                })
+                gestorBD.eliminarMensajes(criterioEliminarMensajes, function (msg){
+                    if(msg == null){
+                        res.send('Error al eliminar mensajes');
+                    }
+                })
+            }
+        })
+    }
 };

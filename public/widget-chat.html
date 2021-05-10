@@ -1,5 +1,4 @@
 <div id="widget-chat" >
-    <button class="btn" onclick="cargarMensajes()">Actualizar</button>
     <table class="table table-hover">
         <tbody id="tablaCuerpo">
         </tbody>
@@ -68,13 +67,12 @@
                 $('input[type="text"]').val('');
 
             },
-            error : function(error){
-                $("#widget-login")
-                    .prepend("<div class='alert alert-danger'>Usuario no identificado</div>");
-            }
         });
     });
 
-
+    //TODO setInterval para cargar los mensajes
     cargarMensajes();
+
+
+
 </script>
