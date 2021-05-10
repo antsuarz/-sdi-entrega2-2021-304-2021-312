@@ -113,6 +113,10 @@ module.exports = function(app, swig, gestorBD) {
         if ( req.query.pg == null){
             pg = 1;
         }
+        //TODO cuando hay menos de 3 paginas que salgan solo las paginas que hay
+        //TODO Cuando hay muchas paginas quedan huecos entre paginas
+        //TODO arreglar cuando haces busqueda y cambias de pagina siga con la misma busqueda
+        //TODO mayusculas y minusc? en busqueda
 
         gestorBD.obtenerOfertasPg(criterio, pg , function(ofertas, total ) {
             if (ofertas == null) {
@@ -134,7 +138,8 @@ module.exports = function(app, swig, gestorBD) {
                     actual : pg,
                     user: req.session.usuario,
                     dinero: req.session.dinero,
-                    admin: req.session.admin
+                    admin: req.session.admin,
+                    ultimaPg: ultimaPg
                 });
                 res.send(respuesta);
             }
@@ -238,6 +243,7 @@ module.exports = function(app, swig, gestorBD) {
 
     //Funcion que obtiene las ofertas que un usuario ha comprado, y las muestra.
     app.get("/compras", function(req,res){
+        //TODO comprobar no poder entrar sin estar loggeado
         let criterio = {"usuario" : req.session.usuario};
         gestorBD.obtenerCompras(criterio, function (compras){
             if(compras == null){

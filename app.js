@@ -1,6 +1,9 @@
 let express = require('express');
 let app = express();
 
+let fs = require('fs');
+let https = require('https');
+
 let expressSession = require('express-session');
 app.use(expressSession({
     secret: 'abcdefg',
@@ -37,9 +40,11 @@ require("./routes/rapiusuarios.js")(app, gestorBD);
 require("./routes/rapiconversaciones.js")(app, gestorBD);
 
 
-
-app.listen(app.get('port'), function(){
-    console.log('servidor activo');
+https.createServer({
+    key: fs.readFileSync('certificates/alice.key'),
+    cert: fs.readFileSync('certificates/alice.crt')
+}, app).listen(app.get('port'), function() {
+    console.log("Servidor activo");
 });
 
 //routerUsuarioAutor

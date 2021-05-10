@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block titulo %} Mis publicaciones {% endblock %} 
 
 {% block contenido_principal %}
-<h2>Mis publicaciones</h2>
+<h2  id="testVistaPublicaciones">Mis publicaciones</h2>
 
 
 <div class="table-responsive">
@@ -25,7 +25,7 @@
 				<td>No</td>
 				{% endif%}
 				{%if !oferta.comprado%}
-				<td><a href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
+				<td><a id="btnEliminar" href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
 			    </td>
 				{%else%}
 				<td>¡Oferta Vendida!</td>

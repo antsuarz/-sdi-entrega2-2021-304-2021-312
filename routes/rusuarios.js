@@ -47,6 +47,7 @@ module.exports = function (app, swig, gestorBD) {
 
     //Función encargada de mostrar el formulario de registro
     app.get("/registrarse", function (req, res) {
+        //TODO sacar error por pantalla al intentar registrarse
         let respuesta = swig.renderFile('views/bregistro.html', {
             user: req.session.usuario,
             dinero: req.session.dinero,
@@ -104,7 +105,7 @@ module.exports = function (app, swig, gestorBD) {
         req.session.dinero = null;
         req.session.admin = null;
         req.session.id = null;
-        res.redirect("/tienda");
+        res.redirect("/identificarse");
     })
 
     //Función que obtiene las ofertas que ha publicado el usuario de sesión
@@ -165,7 +166,7 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-    //Función que elimina uno o varios usuarios de la base de datos
+  //Función que elimina uno o varios usuarios de la base de datos
     app.post('/listaUsuarios', function (req, res) {
         console.log(req.body.usuario);
         if(req.body.usuario != null && req.body.usuario.length > 0) {
