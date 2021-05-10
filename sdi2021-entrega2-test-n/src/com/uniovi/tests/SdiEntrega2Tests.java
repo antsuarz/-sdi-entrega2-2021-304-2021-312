@@ -329,7 +329,7 @@ public class SdiEntrega2Tests {
 		// estado inicial correcto
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
 		// borro el usuario colocado arriba del todo en la lista
-		PO_UserListView.deleteUser(driver, usersDBpreBorrado);
+		PO_UserListView.deleteUser(driver, usersDBpreBorrado -1);
 		// vuelvo a sacar en este momento los usuarios de la base de datos
 		int usersDBpostBorrado = db.getUsers().size();
 		// le resto 1 por que el admin no se encuentra en esa lista
@@ -356,7 +356,7 @@ public class SdiEntrega2Tests {
 		// estado inicial correcto
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
 		// borro el usuario colocado arriba del todo en la lista
-		PO_UserListView.deleteUser(driver, 0, 1, usersDBpreBorrado);
+		PO_UserListView.deleteUser(driver, 0, 1, usersDBpreBorrado -1);
 		// vuelvo a sacar en este momento los usuarios de la base de datos
 		int usersDBpostBorrado = db.getUsers().size();
 		// le resto 1 por que el admin no se encuentra en esa lista
