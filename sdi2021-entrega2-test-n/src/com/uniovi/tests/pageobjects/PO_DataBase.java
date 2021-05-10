@@ -157,11 +157,17 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("test", true));
+			String email;
 			for (int i = 0; i < 10; i++) {
-				String email = "testprueba" + i + "@gmail.com";// "autor" usuario
+				email = "testprueba" + i + "@gmail.com";// "autor" usuario
+				mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("email", email));
 				mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
 				mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
 			}
+			email = "prueba1@prueba1.com";
+			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("email", email));
+			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
+			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
 		} catch (Exception e) {
 		}
 	}
@@ -264,7 +270,7 @@ public class PO_DataBase {
 		}
 		return tmp;
 	}
-
+ 
 	public List<Document> getOfertasUser(String email) {
 
 		List<Document> ofertas = getOfertas();
