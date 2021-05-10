@@ -1,6 +1,8 @@
 module.exports = function (app, gestorBD) {
 
-    //Funcíon que carga todas las conversaciones de un usuario, cuando este es el comprador
+    /**
+     * Funcíon que carga todas las conversaciones de un usuario, cuando este es el comprador
+     */
     app.get("/api/conversaciones/comprar", function (req, res) {
         let criterio = {comprador: req.session.usuario};
         gestorBD.obtenerConversacion(criterio, function (conversacionesComprar) {
@@ -12,8 +14,10 @@ module.exports = function (app, gestorBD) {
             }
         });
     });
-
-    //Funcíon que carga todas las conversaciones de un usuario, cuando este es el vendedor
+    /**
+     * Funcíon que carga todas las conversaciones de un usuario, cuando este es el vendedor
+     *
+     */
     app.get("/api/conversaciones/vender", function (req, res) {
         let criterio = {vendedor: req.session.usuario};
         gestorBD.obtenerConversacion(criterio, function (conversacionesVender) {
@@ -27,7 +31,9 @@ module.exports = function (app, gestorBD) {
     });
 
 
-    //Función que elimina conversaciones de la base de datos, y todos los mensajes asociados a ella
+    /**
+     * Función que elimina conversaciones de la base de datos, y todos los mensajes asociados a ella
+     */
     app.delete("/api/conversaciones/:id", function(req, res) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id) }
         let criterioMsg = {"conversacion" : gestorBD.mongo.ObjectID(req.params.id) }

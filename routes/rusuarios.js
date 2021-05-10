@@ -1,11 +1,15 @@
 module.exports = function (app, swig, gestorBD) {
 
-    //Función que te redirige a la ventana de login por defecto
+    /**
+     * Función que te redirige a la ventana de login por defecto
+     */
     app.get('/', function (req, res) {
         res.redirect("/identificarse");
     });
 
-    //Función que inserta un usuario en la base de datos, comprobando antes si ya existe en esta
+    /**
+     * Función que inserta un usuario en la base de datos, comprobando antes si ya existe en esta
+     */
     app.post('/usuario', function (req, res) {
         if (req.body.password != req.body.rePassword) {
             res.redirect("/registrarse"+
@@ -50,7 +54,9 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-    //Función encargada de mostrar el formulario de registro
+    /**
+     * Función encargada de mostrar el formulario de registro
+     */
     app.get("/registrarse", function (req, res) {
         let respuesta = swig.renderFile('views/bregistro.html', {
             user: req.session.usuario,
@@ -61,7 +67,9 @@ module.exports = function (app, swig, gestorBD) {
     });
 
 
-    //Función encargada de mostrar el formulario de identificación
+    /**
+     * Función encargada de mostrar el formulario de identificación
+     */
     app.get("/identificarse", function (req, res) {
 
         swig.renderFile('views/base.html', {usuario: req.session.usuario});
@@ -73,8 +81,10 @@ module.exports = function (app, swig, gestorBD) {
         res.send(respuesta);
     });
 
-    //Función encargada de identificar un usuario en la base de datos, para ello comprueba si el usuario está registrado previamente
-    //Dependiendo si el usuario está registrado como administrador, o como usuario normal, muestra la tienda, o la vista de administrador
+    /**
+     * Función encargada de identificar un usuario en la base de datos, para ello comprueba si el usuario está registrado previamente.
+     * Dependiendo si el usuario está registrado como administrador, o como usuario normal, muestra la tienda, o la vista de administrador.
+     */
     app.post("/identificarse", function (req, res) {
         let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
             .update(req.body.password).digest('hex');
@@ -103,7 +113,10 @@ module.exports = function (app, swig, gestorBD) {
         });
     });
 
-    //Función que desconecta un usuario de la aplicación
+    /**
+     * Función que desconecta un usuario de la aplicación
+     * Reinicializa los parametros de sesión.
+     */
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
         req.session.dinero = null;
@@ -112,7 +125,9 @@ module.exports = function (app, swig, gestorBD) {
         res.redirect("/identificarse");
     })
 
-    //Función que obtiene las ofertas que ha publicado el usuario de sesión
+    /**
+     * Función que obtiene las ofertas que ha publicado el usuario de sesión.
+     */
     app.get("/publicaciones", function (req, res) {
         if(req.session.usuario != null) {
             let criterio = {autor: req.session.usuario};
@@ -135,7 +150,9 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-    //Función encargada de mostrar la vista de administrador de la aplicación
+    /**
+     * Función encargada de mostrar la vista de administrador de la aplicación
+     */
     app.get("/administrador", function (req, res) {
         if(req.session.admin == "admin") {
             let respuesta = swig.renderFile('views/badministrador.html', {
@@ -147,7 +164,9 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-    //Función que muestra la lista de usuarios registrados en la base de datos
+    /**
+     * Función encargada de mostrar la vista de administrador de la aplicación.
+     */
     app.get("/listaUsuarios", function (req, res) {
         if(req.session.admin == "admin") {
             let criterio = {};
@@ -170,9 +189,10 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
-  //Función que elimina uno o varios usuarios de la base de datos
+    /**
+     * Función que elimina uno o varios usuarios de la base de datos
+     */
     app.post('/listaUsuarios', function (req, res) {
-        console.log(req.body.usuario);
         if(req.body.usuario != null && req.body.usuario.length > 0) {
             if (req.body.usuario[0].length == 1) {
                 let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario)};
@@ -204,9 +224,15 @@ module.exports = function (app, swig, gestorBD) {
         }
     });
 
+    /**
+     * Funcion que se encarga de eliminar cualquier elemento que tenga que ver con un usuario eliminado de la base de datos.
+     * Se eliminan sus ofertas publicadas, sus conversaciones y sus mensajes
+     * @param usuarios, usuarios que van a ser eliminados
+     * @param req
+     * @param res
+     */
     function eliminarTodoReferenteUsuarios(usuarios, req, res){
         if (usuarios[0].length == 1) {
-            console.log(usuarios);
             eliminarUsuarioBD(usuarios, req, res);
         }
         else{
@@ -216,13 +242,19 @@ module.exports = function (app, swig, gestorBD) {
         }
     }
 
+    /**
+     * Función auxiliar de eliminarTodoReferenteUsuarios que elimina un usuario de la base de datos con todo lo referente a este
+     * @param user, usuario a borrar
+     * @param req
+     * @param res
+     */
     function eliminarUsuarioBD(user, req, res){
         let criterio={
             "_id": gestorBD.mongo.ObjectID(user.toString())
         }
         gestorBD.obtenerUsuarios(criterio, function (usuario){
             if(usuario == null || usuario.length == 0){
-                console.log("F");
+                res.send('Ha ocurrido un error inesperado');
             }
             else{
                 let criterioEliminarOfertas={
@@ -261,57 +293,75 @@ module.exports = function (app, swig, gestorBD) {
         })
     }
 
+    /**
+     * Función para validar los campos del formulario de registro de usuarios
+     * @param usuario, usuario a validar
+     * @param rePassword, contenido del formulario donde se repite la contraseña
+     * @param req
+     * @param res
+     * @returns true si el usuario esta validado correctamente, false si ha fallado algun campo de la validación.
+     */
     function validarCamposRegistro(usuario, rePassword, req, res){
         if(usuario.email == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo email no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.email.length < 10){
             res.redirect("/registrarse" +
                 "?mensaje=Email demasiado corto, debe contener más de 10 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.nombre == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo nombre no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.nombre.length < 3){
             res.redirect("/registrarse" +
                 "?mensaje=El campo nombre debe contener al menos 3 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.apellido == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo apellido no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.apellido.length < 5){
             res.redirect("/registrarse" +
                 "?mensaje=El campo apellido debe contener al menos 5 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
 
         else if(usuario.apellido == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo apellido no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.password == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo contraseña no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(usuario.password.length < 8){
             res.redirect("/registrarse" +
                 "?mensaje=El campo apellido debe contener al menos 8 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else if(rePassword == ""){
             res.redirect("/registrarse" +
                 "?mensaje=Por favor repite tu contraseña" +
                 "&tipoMensaje=alert-danger ");
+            return false;
         }
         else
             return true;

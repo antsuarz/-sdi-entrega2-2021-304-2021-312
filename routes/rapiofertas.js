@@ -1,7 +1,9 @@
 module.exports = function(app, gestorBD) {
 
-    //Función que obtiene todas las ofertas de la base de datos
-    //Se hace un filtrado para que descarte las pertenecientes a un determinado usuario.
+    /**
+     * Función que obtiene todas las ofertas de la base de datos
+     * Se hace un filtrado para que descarte las pertenecientes a un determinado usuario.
+     */
     app.get("/api/oferta", function(req, res) {
         let criterio ={};
         gestorBD.obtenerOfertas( criterio , function(ofertas) {
@@ -22,7 +24,9 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-    //Funcion que obtiene ofertas de la base de datos segun un id pasado
+    /**
+     * Funcion que obtiene ofertas de la base de datos segun un id pasado
+     */
     app.get("/api/oferta/:id", function(req, res) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
 
@@ -41,7 +45,9 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-    //Función que elimina una oferta de la base de datos
+    /**
+     * Funcion que elimina una oferta de la base de datos
+     */
     app.delete("/api/oferta/:id", function(req, res) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
 
@@ -58,10 +64,13 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-    //Función que agrega mensajes a una conversación, si no existe esta, la crea.
+    /**
+     * Función que agrega mensajes a una conversación, si no existe esta, la crea.
+     *
+     */
     app.post("/api/mensaje/agregar/:id/:comprador", function (req, res){
         var date = new Date();
-        var fechaString = date.getDay() + "/" +date.getMonth() + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
+        var fechaString = date.getDate() + "/" +(date.getMonth()+1) + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
 
         let criterioOferta = {
             "_id": gestorBD.mongo.ObjectID(req.params.id),
@@ -116,8 +125,10 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-    //Función que nos permite cargar la conversación perteneciente a una oferta en particular, y todos sus mensajes.
-    //En el caso de que no haya conversación creada, envia un array vacio.
+    /**
+     * Función que nos permite cargar la conversación perteneciente a una oferta en particular, y todos sus mensajes.
+     * En el caso de que no haya conversación creada, envia un array vacio.
+     */
     app.get("/api/mensaje/:id/:comprador", function (req, res) {
         //Obtenemos primero la oferta a la que referencia la conversacion, para obtener asi al vendedor
         let criterioOferta = {
@@ -180,13 +191,19 @@ module.exports = function(app, gestorBD) {
         })
     })
 
-    //Función que crea una nueva conversación y añade, a su vez, el mensaje inicial a esta.
-    //En primer lugar se obtiene la oferta a la que pertenecerá la conversación, despues, la creamos
-    //Si se crea satisfactoriamente creamos el mensaje iinicial y lo introducimos.
-    //por último obtenemos la conversación para que se pueda mostrar en el servidor con el primer mensaje.
-    function insertarConversacionBD( criterio, req, res){
+    /**
+     * Función que crea una nueva conversación y añade, a su vez, el mensaje inicial a esta.
+     * En primer lugar se obtiene la oferta a la que pertenecerá la conversación, despues, la creamos
+     * Si se crea satisfactoriamente creamos el mensaje iinicial y lo introducimos.
+     * por último obtenemos la conversación para que se pueda mostrar en el servidor con el primer mensaje.
+     *
+     * @param criterio, criterio para obtener la conversación una vez insertada
+     * @param req
+     * @param res
+     */
+    function insertarConversacionBD(criterio, req, res){
         var date = new Date();
-        var fechaString = date.getUTCDay() + "/" +date.getMonth() + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
+        var fechaString = date.getDate() + "/" +(date.getMonth()+1) + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
         let oferta={"_id" : gestorBD.mongo.ObjectID(req.params.id)};
         gestorBD.obtenerOfertas(oferta, function (ofertas){
             if ( ofertas == null ){
@@ -233,7 +250,12 @@ module.exports = function(app, gestorBD) {
         })
     }
 
-    //Función que inserta un mensaje nuevo en la base de datos
+    /**
+     * Función que inserta un mensaje nuevo en la base de datos
+     * @param mensaje, mensaje a insertar en la base de datos
+     * @param req
+     * @param res
+     */
     function insertarMensajeBD(mensaje,req,res){
         gestorBD.insertarMensaje(mensaje, function (id){
             if (id == null) {

@@ -180,11 +180,12 @@ module.exports = {
             } else {
                 let collection = db.collection('ofertas');
                 collection.count(function(err, count){
-                    collection.find(criterio).skip( (pg-1)*5 ).limit( 5 )
+                    collection.find(criterio).skip( (pg-1)*5 ).limit(5)
                         .toArray(function(err, ofertas) {
                             if (err) {
                                 funcionCallback(null);
                             } else {
+
                                 funcionCallback(ofertas, count);
                             }
                             db.close();
