@@ -106,7 +106,7 @@ module.exports = function (app, swig, gestorBD) {
                                 "&tipoMensaje=alert-danger ");
                         }
                         else{
-                            //TODO nunca entra aqui, el test 06 falla hasta q se arregle
+
                             res.redirect("/identificarse" +
                                 "?mensaje=La contraseña no coincide con la del usuario identificado" +
                                 "&tipoMensaje=alert-danger ");
@@ -192,6 +192,7 @@ module.exports = function (app, swig, gestorBD) {
                         "?mensaje=Ha ocurrido un error inesperado" +
                         "&tipoMensaje=alert-danger ");
                 } else {
+                    ordenarPorNombre(usuarios);
                     let respuesta = swig.renderFile('views/blistausuarios.html',
                         {
                             usuarios: usuarios,
@@ -204,6 +205,17 @@ module.exports = function (app, swig, gestorBD) {
             });
         }
     });
+
+
+    function ordenarPorNombre(usuarios) {
+            usuarios.sort(function (a, b) {
+                if (a.nombre > b.nombre) return 1;
+                if (a.nombre < b.nombre) return -1;
+                return 0;
+            });
+
+
+    }
 
     /**
      * Función que elimina uno o varios usuarios de la base de datos
