@@ -22,13 +22,15 @@ module.exports = function (app, swig, gestorBD) {
                 dinero: 100,
                 tipo: "noadmin"
             }
+            if (validarCamposRegistro(usuario, req.body.rePassword, req, res)) {
+
             let criterio = {
-                email : req.body.email,
+                email: req.body.email,
             }
-            gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+            gestorBD.obtenerUsuarios(criterio, function (usuarios) {
                 if (usuarios == null || usuarios.length != 0) {
                     res.redirect("/registrarse" +
-                        "?mensaje=El usuario ya está registrado en la base de datos"+
+                        "?mensaje=El usuario ya está registrado en la base de datos" +
                         "&tipoMensaje=alert-danger ");
                 } else {
                     gestorBD.insertarUsuario(usuario, function (id) {
@@ -44,12 +46,12 @@ module.exports = function (app, swig, gestorBD) {
                     });
                 }
             });
+            }
         }
     });
 
     //Función encargada de mostrar el formulario de registro
     app.get("/registrarse", function (req, res) {
-        //TODO sacar error por pantalla al intentar registrarse
         let respuesta = swig.renderFile('views/bregistro.html', {
             user: req.session.usuario,
             dinero: req.session.dinero,
@@ -257,5 +259,61 @@ module.exports = function (app, swig, gestorBD) {
                 })
             }
         })
+    }
+
+    function validarCamposRegistro(usuario, rePassword, req, res){
+        if(usuario.email == ""){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo email no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.email.length < 10){
+            res.redirect("/registrarse" +
+                "?mensaje=Email demasiado corto, debe contener más de 10 caracteres" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.nombre == ""){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo nombre no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.nombre.length < 3){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo nombre debe contener al menos 3 caracteres" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.apellido == ""){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo apellido no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.apellido.length < 5){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo apellido debe contener al menos 5 caracteres" +
+                "&tipoMensaje=alert-danger ");
+        }
+
+        else if(usuario.apellido == ""){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo apellido no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.password == ""){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo contraseña no puede estar en blanco" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(usuario.password.length < 8){
+            res.redirect("/registrarse" +
+                "?mensaje=El campo apellido debe contener al menos 8 caracteres" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(rePassword == ""){
+            res.redirect("/registrarse" +
+                "?mensaje=Por favor repite tu contraseña" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else
+            return true;
     }
 };

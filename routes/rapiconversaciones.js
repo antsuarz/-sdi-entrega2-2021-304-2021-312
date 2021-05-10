@@ -56,11 +56,5 @@ module.exports = function (app, gestorBD) {
                 res.send( JSON.stringify(mensajes) );
             }
         });
-
-
-
     });
-
-
-
 }

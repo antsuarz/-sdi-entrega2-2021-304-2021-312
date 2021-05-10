@@ -41,7 +41,7 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-    //Función que elimina ofertas de la base de datos
+    //Función que elimina una oferta de la base de datos
     app.delete("/api/oferta/:id", function(req, res) {
         let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
 

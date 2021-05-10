@@ -47,59 +47,58 @@ module.exports = function(app, swig, gestorBD) {
     //Funcion que inserta una nueva oferta en la base de datos a traves de los datos recogidos de un formulario
     //Se encarga tambien de verificar que los datos son correctos
     app.post("/ofertas", function (req, res) {
-
+    if(req.session.usuario != null || req.session.usuario != undefined ) {
         var date = new Date();
-        var fechaString = date.getUTCDay() + "/" +date.getMonth() + "/"+ date.getFullYear()+" Hora: " + date.getHours()+":"+date.getMinutes();
+        var fechaString = date.getUTCDay() + "/" + date.getMonth() + "/" + date.getFullYear() + " Hora: " + date.getHours() + ":" + date.getMinutes();
         let oferta = {
             nombre: req.body.nombre,
             detalles: req.body.detalles,
             fecha: fechaString,
             autor: req.session.usuario,
-            precio:req.body.precio,
+            precio: req.body.precio,
             comprado: false,
             destacada: req.body.destacada
         }
-        if(oferta.nombre.length < 5){
-            res.redirect("/tienda" +
-                "?mensaje=El nombre de la oferta es demasiado corto (debe ser superior a 5)."+
+        validarBlancos(oferta,req, res);
+        if (oferta.nombre.length < 5) {
+            res.redirect("/ofertas/agregar" +
+                "?mensaje=El nombre de la oferta es demasiado corto (debe ser superior a 5)." +
                 "&tipoMensaje=alert-danger ");
-            return;
-        }
-        if (oferta.precio <= 0) {
-            res.redirect("/tienda" +
-                "?mensaje=El precio de la oferta debe ser superior a 0."+
+        } else if (oferta.precio <= 0) {
+            res.redirect("/ofertas/agregar" +
+                "?mensaje=El precio de la oferta debe ser superior a 0." +
                 "&tipoMensaje=alert-danger ");
-            return;
-        }
-        if (oferta.detalles.length < 8) {
-            res.redirect("/tienda" +
-                "?mensaje=Los detalles de la oferta deben contener al menos 8 caracteres"+
+
+        } else if (oferta.detalles.length < 8) {
+            res.redirect("/ofertas/agregar" +
+                "?mensaje=Los detalles de la oferta deben contener al menos 8 caracteres" +
                 "&tipoMensaje=alert-danger ");
-            return;
-        }
-        if(oferta.destacada != null){
+        } else if (oferta.destacada != null) {
             if (req.session.dinero >= 20) {
                 let dinero = {"dinero": req.session.dinero - 20};
                 req.session.dinero = dinero.dinero;
                 let usuarioId = {"_id": gestorBD.mongo.ObjectID(req.session.user._id)};
-                gestorBD.modificarDineroUsuario(usuarioId, dinero,function (id) {
+                gestorBD.modificarDineroUsuario(usuarioId, dinero, function (id) {
                     if (id == null) {
                         res.redirect("/tienda" +
-                            "?mensaje=Ha ocurrido un error al modificar el dinero del usuario"+
+                            "?mensaje=Ha ocurrido un error al modificar el dinero del usuario" +
                             "&tipoMensaje=alert-danger ");
                     } else {
-                        insertarOfertaBD(oferta, req ,res);
+                        insertarOfertaBD(oferta, req, res);
                     }
                 });
             } else {
                 res.redirect("/ofertas/agregar" +
-                    "?mensaje=No puedes comprar esta oferta"+
+                    "?mensaje=No puedes comprar esta oferta" +
                     "&tipoMensaje=alert-danger ");
             }
-        }
-        else {
+        } else {
             insertarOfertaBD(oferta, req, res);
         }
+    }
+    else{
+        res.redirect("/identificate");
+    }
     });
 
 
@@ -114,7 +113,6 @@ module.exports = function(app, swig, gestorBD) {
             pg = 1;
         }
         //TODO cuando hay menos de 3 paginas que salgan solo las paginas que hay
-        //TODO Cuando hay muchas paginas quedan huecos entre paginas
         //TODO arreglar cuando haces busqueda y cambias de pagina siga con la misma busqueda
         //TODO mayusculas y minusc? en busqueda
 
@@ -310,5 +308,22 @@ module.exports = function(app, swig, gestorBD) {
             });
     }
 
+    function validarBlancos(oferta, req, res){
+        if(oferta.nombre == ""){
+            res.redirect("/ofertas/agregar" +
+                "?mensaje=El campo nombre no puede estar vacio" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(oferta.detalles == ""){
+            res.redirect("/ofertas/agregar" +
+                "?mensaje=El campo detalles no puede estar vacio" +
+                "&tipoMensaje=alert-danger ");
+        }
+        else if(oferta.precio == ""){
+            res.redirect("/ofertas/agregar" +
+                "?mensaje=El campo precio no puede estar vacio" +
+                "&tipoMensaje=alert-danger ");
+        }
+    }
 };
 
