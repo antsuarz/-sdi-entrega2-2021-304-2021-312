@@ -166,15 +166,31 @@ module.exports = function (app, swig, gestorBD) {
 
     //Función que elimina uno o varios usuarios de la base de datos
     app.post('/listaUsuarios', function (req, res) {
-        for (let i = 0; i < req.body.usuario.length; i++) {
-            let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
-            gestorBD.eliminarUsuario(criterio, function (usuarios) {
-                if (usuarios == null) {
-                    res.send('Error al eliminar usuarios.');
+        console.log(req.body.usuario);
+        if(req.body.usuario != null && req.body.usuario.length > 0) {
+            if (req.body.usuario[0].length == 1) {
+                let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario)};
+                gestorBD.eliminarUsuario(criterio, function (usuarios) {
+                    if (usuarios == null) {
+                        res.send('Error al eliminar usuarios.');
+                    }else{
+                        res.redirect('/listaUsuarios');
+                    }
+                });
+            } else {
+                for (let i = 0; i < req.body.usuario.length; i++) {
+                    console.log(req.body.usuario[i]);
+
+                    let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
+                    gestorBD.eliminarUsuario(criterio, function (usuarios) {
+                        if (usuarios == null) {
+                            res.send('Error al eliminar usuarios.');
+                        }
+                    });
+                    if (i == req.body.usuario.length - 1)
+                        res.redirect('/listaUsuarios');
                 }
-            });
-            if(i == req.body.usuario.length - 1)
-                res.redirect('/listaUsuarios');
+            }
         }
     });
 };
