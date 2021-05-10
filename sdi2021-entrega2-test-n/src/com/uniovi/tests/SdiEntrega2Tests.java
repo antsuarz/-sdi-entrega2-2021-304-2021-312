@@ -21,6 +21,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
 import com.uniovi.tests.pageobjects.PO_Compras;
 import com.uniovi.tests.pageobjects.PO_DataBase;
+import com.uniovi.tests.pageobjects.PO_Destacadas;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
@@ -123,11 +124,10 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR02() {
-		
+
 		PO_RegisterView.registerUser(driver, "", "", "", "");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
-		// TODO comprobar sacar error por pantalla al intentar registrarse
 	}
 
 	/**
@@ -140,7 +140,9 @@ public class SdiEntrega2Tests {
 		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "123456", "aaaa", "Nombre", "Apellido");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
-		//TODO mensaje conraseña invalida
+		// mensaje conraseña invalida
+		String errMsg = "La contraseña no se ha repetido correctamente ";
+		PO_View.checkElement(driver, "text", errMsg);
 	}
 
 	/**
@@ -184,9 +186,8 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.login(driver, "testprueba1@gmail.com", "invalida");
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
-		// assert Algo va mal
-		// TODO igual poner un mensage mas explicativo
-		String errMsg = "Algo va mal";
+		// assert 
+		String errMsg = "El usuario no se ha encontrado en la base de datos";
 		PO_View.checkElement(driver, "text", errMsg);
 
 	}
@@ -202,7 +203,6 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.login(driver, "", "");
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
-		// TODO igual poner algun mensaje de que no puede ser en blanco
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class SdiEntrega2Tests {
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
 		// TODO igual poner algun mensaje de que email no existe
-		String errMsg = "Algo va mal";
+		String errMsg = "El usuario no se ha encontrado en la base de datos";
 		PO_View.checkElement(driver, "text", errMsg);
 	}
 
@@ -367,8 +367,7 @@ public class SdiEntrega2Tests {
 		// entramos en la pagina adecuada
 		PO_AgregarOfertasView.accesoAgregarOfertasView(driver);
 		// rellenamos el formulario
-		PO_AgregarOfertasView.fillForm(driver, "OfertaTestNombre", "OfertaTestDetalles", "1", ".\\img\\caratula.jpg",
-				false);
+		PO_AgregarOfertasView.fillForm(driver, "OfertaTestNombre", "OfertaTestDetalles", 1, false);
 		// nos desconectamos
 		PO_LoginView.desconectarse(driver);
 		// nos metemos en /publicaciones
@@ -390,7 +389,7 @@ public class SdiEntrega2Tests {
 		// entramos en la pagina adecuada
 		PO_AgregarOfertasView.accesoAgregarOfertasView(driver);
 		// rellenamos el formulario
-		PO_AgregarOfertasView.fillForm(driver, "", "OfertaTestDetalles", "-1", ".\\img\\caratula.jpg", false);
+		PO_AgregarOfertasView.fillForm(driver, "", "OfertaTestDetalles", -1, false);
 		// comprobamos que seguimos en la misma pagina
 		PO_NavView.checkIdOnView(driver, "testVistaOfertasAgregar");
 
@@ -512,14 +511,14 @@ public class SdiEntrega2Tests {
 	public void PR23() {
 		// vamos a la pagina de la tienda
 		PO_TiendaView.accesoTiendaView(driver);
-		//pulsamos la oferta precio5
+		// pulsamos la oferta precio5
 		PO_TiendaView.pulsarOferta(driver, "precio5");
 //		--compramos la oferta precio5
 		PO_TiendaView.comprarOferta(driver);
-		//vamos a la vista de las compras
-		PO_NavView.clickOption(driver, "/compras", "text", "Nombre" );
-		//comprobamos que se haya comprado
-		PO_Compras.checkItemOnList(driver,"precio5");
+		// vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre");
+		// comprobamos que se haya comprado
+		PO_Compras.checkItemOnList(driver, "precio5");
 
 	}
 
@@ -533,14 +532,14 @@ public class SdiEntrega2Tests {
 	public void PR24() {
 		// vamos a la pagina de la tienda
 		PO_TiendaView.accesoTiendaView(driver);
-		//pulsamos la oferta precio100
+		// pulsamos la oferta precio100
 		PO_TiendaView.pulsarOferta(driver, "precio100");
 //		--compramos la oferta precio100
 		PO_TiendaView.comprarOferta(driver);
-		//vamos a la vista de las compras
-		PO_NavView.clickOption(driver, "/compras", "text", "Nombre" );
-		//comprobamos que se haya comprado
-		PO_Compras.checkItemOnList(driver,"precio100");
+		// vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre");
+		// comprobamos que se haya comprado
+		PO_Compras.checkItemOnList(driver, "precio100");
 	}
 
 	/**
@@ -552,16 +551,16 @@ public class SdiEntrega2Tests {
 	public void PR25() {
 		// vamos a la pagina de la tienda
 		PO_TiendaView.accesoTiendaView(driver);
-		//pulsamos la oferta precio105
+		// pulsamos la oferta precio105
 		PO_TiendaView.pulsarOferta(driver, "precio105");
 //		--compramos la oferta precio105
 		PO_TiendaView.comprarOferta(driver);
-		//compruebo que sale el mensaje de error
+		// compruebo que sale el mensaje de error
 		String errMsg = "No tienes suficiente dinero para comprar esta oferta ";
 		PO_View.checkElement(driver, "text", errMsg);
-		//vamos a la vista de las compras
-		PO_NavView.clickOption(driver, "/compras", "text", "Nombre" );
-		//comprobamos que se haya comprado
+		// vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre");
+		// comprobamos que se haya comprado
 		PO_Compras.checkEmptyList(driver);
 	}
 
@@ -571,20 +570,20 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR26() {
-		//vamos a la vista correspondiente
+		// vamos a la vista correspondiente
 		PO_Compras.accesoComprasView(driver);
-		//comprobamos que se haya comprado
+		// comprobamos que se haya comprado
 		PO_Compras.checkEmptyList(driver);
-		//creamos datos dummy para comprobar que salgan cosas
+		// creamos datos dummy para comprobar que salgan cosas
 		db.addRandomComprasTo("testprueba1@gmail.com");
 		db.showDataOfDB();
-		//nos desconectamos
+		// nos desconectamos
 		PO_LoginView.desconectarse(driver);
-		//nos volvemos a loggear y entrar a la pagina correcta
+		// nos volvemos a loggear y entrar a la pagina correcta
 		PO_Compras.accesoComprasView(driver);
-		//comprobamos que la lista no este vacía
+		// comprobamos que la lista no este vacía
 		PO_Compras.checkComprasOnList(driver);
-		
+
 	}
 
 	/**
@@ -595,7 +594,25 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR27() {
-		assertTrue("PR27 sin hacer", false);
+		// accedemos a la vista asociada
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver);
+		// rellenamos el formulario
+		String nameOferta = "Cancion prueba";
+		int precio = 3;
+		PO_AgregarOfertasView.fillForm(driver, nameOferta, "Cancion de prueba para que sea destacada", precio, true);
+
+		// redireccion publicaciones: comprobamos que estamos en publicaciones
+		PO_NavView.checkIdOnView(driver, "testVistaPublicaciones");
+		// vamos a la vista de ofertas destacadas
+		PO_NavView.clickOption(driver, "/ofertas/destacadas", "free", "Nombre");
+		// comprobamos que la oferta aparece en la lista
+		PO_Destacadas.checkOfertaByName(driver, nameOferta);
+
+		// comprobamos que el precio es el correcto
+		PO_Destacadas.checkPrecioOfOferta(driver, nameOferta, precio);
+		// comprobamos tener el saldo correspondiente 100 - 20 = 80
+		PO_NavView.checkSaldo(driver, 80);
+
 	}
 
 	/**

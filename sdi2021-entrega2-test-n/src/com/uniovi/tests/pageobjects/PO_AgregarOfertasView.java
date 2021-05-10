@@ -19,9 +19,25 @@ public class PO_AgregarOfertasView {
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaOfertasAgregar");
 	}
-	
 
-	static public void fillForm(WebDriver driver, String nombrep, String detallesp, String preciop, String fotopath, boolean destacadap) {
+	static public void fillForm(WebDriver driver, String nombrep, String detallesp, int preciop, boolean destacadap) {
+		fillFormCaratula(driver, nombrep, detallesp, preciop, null, destacadap);
+	}
+
+	/**
+	 * EJEMPLO LLAMADA PO_AgregarOfertasView.fillFormCaratula(driver, nameOferta,
+	 * "Cancion de prueba para que sea destacada", precio, ".\\img\\caratula.jpg",
+	 * true);
+	 * 
+	 * @param driver
+	 * @param nombrep
+	 * @param detallesp
+	 * @param preciop
+	 * @param fotopath
+	 * @param destacadap
+	 */
+	static public void fillFormCaratula(WebDriver driver, String nombrep, String detallesp, int preciop,
+			String fotopath, boolean destacadap) {
 		WebElement nombre = driver.findElement(By.name("nombre"));
 		nombre.click();
 		nombre.clear();
@@ -33,25 +49,29 @@ public class PO_AgregarOfertasView {
 		WebElement precio = driver.findElement(By.name("precio"));
 		precio.click();
 		precio.clear();
-		precio.sendKeys(preciop);
-		// find the input element
-		WebElement elem = driver.findElement(By.xpath("//input[@type='file']"));
-		// 'type' the file location to it as it were a usual <input type='text' /> element
-		File f = new File(fotopath);
-		if (f.exists()) {
-			elem.sendKeys( f.getAbsolutePath());
+		precio.sendKeys(String.valueOf(preciop));
+		if (fotopath != null) {
+			// find the input element
+			WebElement elem = driver.findElement(By.xpath("//input[@type='file']"));
+			// 'type' the file location to it as it were a usual <input type='text' />
+			// element
+			File f = new File(fotopath);
+			if (f.exists()) {
+				elem.sendKeys(f.getAbsolutePath());
+			}
+
 		}
-		
+
 		if (destacadap) {
 			WebElement destacada = driver.findElement(By.name("destacada"));
 			destacada.click();
 			destacada.clear();
 			destacada.click();
 		}
-		
-		//Pulsar el boton de Alta.
+
+		// Pulsar el boton de Alta.
 		By boton = By.className("btn");
-		driver.findElement(boton).click();	
+		driver.findElement(boton).click();
 	}
 
 }
