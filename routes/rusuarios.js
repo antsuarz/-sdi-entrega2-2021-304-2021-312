@@ -110,23 +110,25 @@ module.exports = function (app, swig, gestorBD) {
 
     //Función que obtiene las ofertas que ha publicado el usuario de sesión
     app.get("/publicaciones", function (req, res) {
-        let criterio = {autor: req.session.usuario};
-        gestorBD.obtenerOfertas(criterio, function (ofertas) {
-            if (ofertas == null) {
-                res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado"+
-                    "&tipoMensaje=alert-danger ");
-            } else {
-                let respuesta = swig.renderFile('views/bpublicaciones.html',
-                    {
-                        ofertas: ofertas,
-                        user: req.session.usuario,
-                        dinero: req.session.dinero,
-                        admin: req.session.admin
-                    });
-                res.send(respuesta);
-            }
-        });
+        if(req.session.usuario != null) {
+            let criterio = {autor: req.session.usuario};
+            gestorBD.obtenerOfertas(criterio, function (ofertas) {
+                if (ofertas == null) {
+                    res.redirect("/tienda" +
+                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "&tipoMensaje=alert-danger ");
+                } else {
+                    let respuesta = swig.renderFile('views/bpublicaciones.html',
+                        {
+                            ofertas: ofertas,
+                            user: req.session.usuario,
+                            dinero: req.session.dinero,
+                            admin: req.session.admin
+                        });
+                    res.send(respuesta);
+                }
+            });
+        }
     });
 
     //Función encargada de mostrar la vista de administrador de la aplicación
