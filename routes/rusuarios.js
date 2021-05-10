@@ -221,8 +221,6 @@ module.exports = function (app, swig, gestorBD) {
                 });
             } else {
                 for (let i = 0; i < req.body.usuario.length; i++) {
-
-
                     let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
                     eliminarTodoReferenteUsuarios(req.body.usuario, req, res);
                     gestorBD.eliminarUsuario(criterio, function (usuarios) {
@@ -258,7 +256,7 @@ module.exports = function (app, swig, gestorBD) {
     }
 
     /**
-     * Función auxiliar de eliminarTodoReferenteUsuarios que elimina un usuario de la base de datos con todo lo referente a este
+     * Función auxiliar  que elimina un usuario de la base de datos con lo referente a este
      * @param user, usuario a borrar
      * @param req
      * @param res
