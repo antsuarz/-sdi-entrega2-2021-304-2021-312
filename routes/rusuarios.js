@@ -106,6 +106,7 @@ module.exports = function (app, swig, gestorBD) {
                                 "&tipoMensaje=alert-danger ");
                         }
                         else{
+                            //TODO nunca entra aqui, el test 06 falla hasta q se arregle
                             res.redirect("/identificarse" +
                                 "?mensaje=La contraseña no coincide con la del usuario identificado" +
                                 "&tipoMensaje=alert-danger ");

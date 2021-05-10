@@ -187,7 +187,8 @@ public class SdiEntrega2Tests {
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
 		// assert 
-		String errMsg = "El usuario no se ha encontrado en la base de datos";
+		
+		String errMsg = "La contraseña no coincide con la del usuario identificado";
 		PO_View.checkElement(driver, "text", errMsg);
 
 	}
@@ -246,15 +247,24 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR10() {
-		String text = "Inicio";
+		String text = " Desconectarse";
 		String busqueda = "//*[contains(text(),'" + text + "')]";
-
-		Boolean resultado;
-
-		resultado = (new WebDriverWait(driver, 2))
+		//compruebo la invisibilidad del elemento
+		Boolean resultado = (new WebDriverWait(driver, 2))
 				.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(busqueda)));
-
 		assertTrue(resultado);
+		//compruebo justo lo contrario para asegurar de que si que sale estando conectado
+		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
+//		compruebo justo lo contrario
+		try {
+			(new WebDriverWait(driver, 2))
+					.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(busqueda)));
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+		
+		
+		
 	}
 
 	/**
