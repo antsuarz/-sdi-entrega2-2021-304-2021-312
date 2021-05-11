@@ -855,6 +855,7 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR39() {
+		assertTrue("implementar validador de recepcion de mensaje", false);
 		// CREO LA OFERTA DEL USUARIO PABLO 2
 		// quito los usuarios de test para probar esta parte
 		db.ResetDummyData();
@@ -898,6 +899,8 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR40() {
+		assertTrue("implementar validador de recepcion de mensaje", false);
+		
 		// CREO LA OFERTA DEL USUARIO PABLO 2
 		// quito los usuarios de test para probar esta parte
 		db.ResetDummyData();
