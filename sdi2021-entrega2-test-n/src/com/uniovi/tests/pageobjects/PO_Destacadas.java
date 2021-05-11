@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -22,7 +23,7 @@ public class PO_Destacadas {
 	
 	public static void checkComprasNotEmptyList(WebDriver driver) {
 
-		PO_NavView.checkIdOnView(driver, "testVistaCompras");
+		PO_NavView.checkIdOnView(driver, "testViewOfertasDestacadas");
 
 		List<WebElement> compras = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
 		assertTrue(compras.size() > 0);
@@ -31,7 +32,7 @@ public class PO_Destacadas {
 
 	public static void checkExpectedComprasOnList(WebDriver driver, int expectedValue) {
 
-		PO_NavView.checkIdOnView(driver, "testVistaCompras");
+		PO_NavView.checkIdOnView(driver, "testViewOfertasDestacadas");
 
 		List<WebElement> compras = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
 		assertTrue(compras.size() == expectedValue);
@@ -41,12 +42,16 @@ public class PO_Destacadas {
 	
 	public static void checkPrecioOfOferta(WebDriver driver,  String nombre, int expectedPrecio) {
 
-		PO_NavView.checkIdOnView(driver, "testVistaCompras");
+		PO_NavView.checkIdOnView(driver, "testViewOfertasDestacadas");
 
 		List<WebElement> compras = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
-		int precio = 0;
+		int precio = 0;//testDineroUsuario
 		for (WebElement webElement : compras) {
-			System.out.println(webElement.getText());
+			List<WebElement> hijos = webElement.findElements(By.xpath("./child::*"));
+			if (hijos.get(0).getText().equals(nombre)) {
+				precio = Integer.parseInt(  hijos.get(3).getText());
+			}
+			
 		}
 		
 		

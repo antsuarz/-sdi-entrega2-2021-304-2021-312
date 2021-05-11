@@ -65,8 +65,8 @@ public class PO_AgregarOfertasView {
 		if (destacadap) {
 			WebElement destacada = driver.findElement(By.name("destacada"));
 			destacada.click();
-			destacada.clear();
-			destacada.click();
+//			destacada.clear();
+//			destacada.click();
 		}
 
 		// Pulsar el boton de Alta.

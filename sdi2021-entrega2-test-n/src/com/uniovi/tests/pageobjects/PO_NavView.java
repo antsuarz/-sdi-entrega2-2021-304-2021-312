@@ -62,19 +62,34 @@ public class PO_NavView extends PO_View {
 	}
 
 	public static void checkSaldo(WebDriver driver, int saldo) {
+		
+//		List<WebElement> elementos = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"btnEliminar\"]",PO_View.getTimeout());
+		
 		List<WebElement> compras = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
 		assertTrue(compras.size() > 0);
 		// identify element
 		List<WebElement> t = SeleniumUtils.EsperaCargaPagina(driver, "free", "//*[@id=\"" + "mDinero" + "\"]", PO_View.getTimeout());
-		
-		
+		int precio = 0;
+		boolean precioOK = true;
 		// identify child nodes with ./child::* expression in xpath
 		List<WebElement> c = t.get(0).findElements(By.xpath("./child::*"));
 		// iterate child nodes
 		for (WebElement i : c) {
 			// getText() to get text for child nodes
-			System.out.println(i.getText());
+			String saldostr =  i.getText().substring(7, i.getText().length()-1).trim();
+			System.out.println(saldostr);
+			try {
+				precio = Integer.parseInt( saldostr);
+			} catch (NumberFormatException e) {
+				precioOK = false;
+				assertTrue(String.valueOf(saldo).equals(saldostr));
+			}
+			
 		}
+		if (precioOK) {
+			assertTrue(precio == saldo);
+		}
+		
 	}
 
 }

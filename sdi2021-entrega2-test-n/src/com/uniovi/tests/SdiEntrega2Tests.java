@@ -362,7 +362,7 @@ public class SdiEntrega2Tests {
 		// le resto 1 por que el admin no se encuentra en esa lista
 		usersDBpostBorrado--;
 		// asserto de la base de datos
-		assertEquals(usersDBpreBorrado - 1, usersDBpostBorrado);
+		assertEquals(usersDBpreBorrado - 3, usersDBpostBorrado);
 		// asserto de la web
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpostBorrado);
 	}
@@ -402,6 +402,7 @@ public class SdiEntrega2Tests {
 		PO_AgregarOfertasView.fillForm(driver, "", "OfertaTestDetalles", -1, false);
 		// comprobamos que seguimos en la misma pagina
 		PO_NavView.checkIdOnView(driver, "testVistaOfertasAgregar");
+		//TODO comprobar texto error
 
 	}
 
@@ -614,7 +615,7 @@ public class SdiEntrega2Tests {
 		// redireccion publicaciones: comprobamos que estamos en publicaciones
 		PO_NavView.checkIdOnView(driver, "testVistaPublicaciones");
 		// vamos a la vista de ofertas destacadas
-		PO_NavView.clickOption(driver, "/ofertas/destacadas", "free", "Nombre");
+		PO_NavView.clickOption(driver, "/ofertas/destacadas", "text", "Nombre");
 		// comprobamos que la oferta aparece en la lista
 		PO_Destacadas.checkOfertaByName(driver, nameOferta);
 
