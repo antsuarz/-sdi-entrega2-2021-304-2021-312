@@ -501,8 +501,8 @@ public class SdiEntrega2Tests {
 		PO_TiendaView.checkOffersMoreThan(driver, db, 0);
 		// realizamos la busqueda mayuscula y minuscula
 		PO_TiendaView.busquedaOferta(driver, "OFERTA");
-		// Comprobamos que el usuario no puede ver las ofertas
-		PO_TiendaView.checkEmptyOffers(driver, db);
+//		comprobamos que existan ofertas
+		PO_TiendaView.checkOffersMoreThan(driver, db, 0);
 
 	}
 
@@ -575,13 +575,21 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR26() {
-		// vamos a la vista correspondiente
-		PO_Compras.accesoComprasView(driver);
+		
+
+		// vamos a la pagina de la tienda
+		PO_TiendaView.accesoTiendaView(driver);
+		// pulsamos la oferta precio5
+		PO_TiendaView.pulsarOferta(driver, "precio5");
+//		--compramos la oferta precio5
+		PO_TiendaView.comprarOferta(driver);
+		// vamos a la vista de las compras
+		PO_NavView.clickOption(driver, "/compras", "text", "Nombre");
 		// comprobamos que se haya comprado
-		PO_Compras.checkEmptyList(driver);
-		// creamos datos dummy para comprobar que salgan cosas
-		db.addRandomComprasTo("testprueba1@gmail.com");
-		db.showDataOfDB();
+		PO_Compras.checkItemOnList(driver, "precio5");
+		
+		
+		
 		// nos desconectamos
 		PO_LoginView.desconectarse(driver);
 		// nos volvemos a loggear y entrar a la pagina correcta
@@ -746,7 +754,7 @@ public class SdiEntrega2Tests {
 //		\\creo un uuid para asegurarme q siempre sea una oferta con nombre distinto
 		String nombreOferta = UUID.randomUUID().toString();
 		//inicio sesion como pablo2
-		PO_AgregarOfertasView.accesoAgregarOfertasView(driver,"pablo2@email.com","123456");
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver,"pablo2@email.com","12345678");
 		//creo una oferta nueva
 		PO_AgregarOfertasView.fillForm(driver, nombreOferta  , "OfertaPablo2TEST", 6, false);
 		
@@ -776,7 +784,7 @@ public class SdiEntrega2Tests {
 		// vamos a la vista de las ofertas
 		PO_OfertasWidget.accesoOfertasWidget(driver, "pablo@email.com", "12345678");
 		// vamos al chat correspondiente
-		PO_OfertasWidget.clickChatOferta(driver, "OfertaPablo2");
+		PO_OfertasWidget.clickChatOferta(driver);
 		// comprobamos que estamos en la vista del chat
 		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
 		// envio el mensaje alavez que lo compruebo

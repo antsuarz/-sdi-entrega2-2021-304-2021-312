@@ -50,6 +50,19 @@ public class PO_OfertasWidget {
 			
 		}
 		
+		PO_View.checkElement(driver, "text", nombre);
 	
+	}
+	public static void clickChatOferta(WebDriver driver) {
+		PO_NavView.checkIdOnView(driver, "testClienteOfertasView");
+		
+		List<WebElement> ofertas = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
+
+		for (WebElement webElement : ofertas) {
+			webElement.findElements(By.xpath("./child::*")).get(4).findElements(By.xpath("./child::*")).get(0).click();
+			return;
+			
+			
+		}
 	}
 }

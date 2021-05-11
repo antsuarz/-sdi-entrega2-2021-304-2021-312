@@ -87,6 +87,8 @@ public class PO_NavView extends PO_View {
 			
 		}
 		if (precioOK) {
+			System.out.println(precio);
+			System.out.println(saldo);
 			assertTrue(precio == saldo);
 		}
 		
