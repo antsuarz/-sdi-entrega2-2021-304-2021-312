@@ -26,7 +26,7 @@ module.exports = function (app, swig, gestorBD) {
                 dinero: 100,
                 tipo: "noadmin"
             }
-            if (validarCamposRegistro(usuario, req.body.rePassword, req, res)) {
+            if (validarCamposRegistro(usuario,req.body.password, req.body.rePassword, req, res)) {
 
             let criterio = {
                 email: req.body.email,
@@ -234,8 +234,6 @@ module.exports = function (app, swig, gestorBD) {
                 });
             } else {
                 for (let i = 0; i < req.body.usuario.length; i++) {
-
-
                     let criterio = {"_id": gestorBD.mongo.ObjectID(req.body.usuario[i])};
                     eliminarTodoReferenteUsuarios(req.body.usuario, req, res);
                     gestorBD.eliminarUsuario(criterio, function (usuarios) {
@@ -246,9 +244,11 @@ module.exports = function (app, swig, gestorBD) {
                     if (i == req.body.usuario.length - 1) {
                         res.redirect('/listaUsuarios');
                     }
-
                 }
             }
+        }
+        else{
+            res.redirect('/listaUsuarios');
         }
     });
 
@@ -271,7 +271,7 @@ module.exports = function (app, swig, gestorBD) {
     }
 
     /**
-     * Función auxiliar de eliminarTodoReferenteUsuarios que elimina un usuario de la base de datos con todo lo referente a este
+     * Función auxiliar  que elimina un usuario de la base de datos con lo referente a este
      * @param user, usuario a borrar
      * @param req
      * @param res
@@ -329,7 +329,7 @@ module.exports = function (app, swig, gestorBD) {
      * @param res
      * @returns true si el usuario esta validado correctamente, false si ha fallado algun campo de la validación.
      */
-    function validarCamposRegistro(usuario, rePassword, req, res){
+    function validarCamposRegistro(usuario,password, rePassword, req, res){
         if(usuario.email == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo email no puede estar en blanco" +
@@ -373,15 +373,15 @@ module.exports = function (app, swig, gestorBD) {
                 "&tipoMensaje=alert-danger ");
             return false;
         }
-        else if(usuario.password == ""){
+        else if(password == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo contraseña no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
             return false;
         }
-        else if(usuario.password.length < 8){
+        else if(password.length < 8){
             res.redirect("/registrarse" +
-                "?mensaje=El campo apellido debe contener al menos 8 caracteres" +
+                "?mensaje=La contraseña debe contener al menos 8 caracteres" +
                 "&tipoMensaje=alert-danger ");
             return false;
         }
