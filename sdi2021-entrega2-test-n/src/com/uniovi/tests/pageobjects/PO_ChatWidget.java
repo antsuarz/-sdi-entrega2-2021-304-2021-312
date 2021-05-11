@@ -43,8 +43,8 @@ public class PO_ChatWidget {
 
 	public static void checkNumberOfChatsInView(WebDriver driver, int expectedValue) {
 		List<WebElement> chats = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
-		System.out.println(chats.size());
-		System.out.println(expectedValue);
+//		System.out.println(chats.size());
+//		System.out.println(expectedValue);
 		assertTrue(chats.size() >= expectedValue);
 	}
 

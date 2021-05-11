@@ -63,8 +63,15 @@ new PO_DataBase().showDataOfDB();
 
 	}
 
+	public void insertUser(String email, String password, String nombre,
+			String apellido, Integer dinero) {
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			insertUser(mongoclient, email, password, nombre, apellido, dinero);
+		}
+	}
+	
 	@SuppressWarnings("unused")
-	private static void insertUser(MongoClient mongoclient, String email, String password, String nombre,
+	private void insertUser(MongoClient mongoclient, String email, String password, String nombre,
 			String apellido, Integer dinero) {
 
 		String defaultEmail = "aaaaaaa@gmail.com";
@@ -158,6 +165,20 @@ new PO_DataBase().showDataOfDB();
 		}
 	}
 
+	public void insertOferta(String nombre,String detalles, Date fecha, String autor, int precio ,boolean comprado,boolean destacada ) {
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			Document oferta = new Document().append("nombre", nombre)
+					.append("detalles", detalles)
+					.append("fecha", fecha.toGMTString())
+					.append("autor",autor)
+					.append("precio", precio)
+					.append("comprado", comprado)
+					.append("destacada", destacada)
+					.append("test", true);
+			mongoclient.getDatabase(AppDBname).getCollection("ofertas").insertOne(oferta);
+		}
+	}
+	
 	@SuppressWarnings("deprecation")
 	private void insertOfertas() {
 		// Document{{_id=609479cc4b44d8342879cc99, nombre=Oferta 1, detalles=Esta es la
@@ -449,5 +470,7 @@ new PO_DataBase().showDataOfDB();
 		}
 		return mensajesUser;
 	}
+
+
 
 }

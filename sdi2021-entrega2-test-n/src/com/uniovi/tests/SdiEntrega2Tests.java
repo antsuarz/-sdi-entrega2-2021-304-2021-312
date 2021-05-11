@@ -3,6 +3,7 @@ package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.UUID;
 
 //Paquetes JUnit 
@@ -92,7 +93,6 @@ public class SdiEntrega2Tests {
 		// Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
-
 
 	/**
 	 * [Prueba1] Registro de Usuario con datos válidos.
@@ -353,7 +353,7 @@ public class SdiEntrega2Tests {
 		usersDBpostBorrado--;
 		// asserto de la base de datos
 		assertEquals(usersDBpreBorrado - 3, usersDBpostBorrado);
-		//nos desconectamos para ver que aun funciona
+		// nos desconectamos para ver que aun funciona
 		PO_LoginView.desconectarse(driver);
 		// vamos a la lista de usuarios
 		PO_UserListView.accesoUserList(driver);
@@ -575,7 +575,6 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR26() {
-		
 
 		// vamos a la pagina de la tienda
 		PO_TiendaView.accesoTiendaView(driver);
@@ -587,9 +586,7 @@ public class SdiEntrega2Tests {
 		PO_NavView.clickOption(driver, "/compras", "text", "Nombre");
 		// comprobamos que se haya comprado
 		PO_Compras.checkItemOnList(driver, "precio5");
-		
-		
-		
+
 		// nos desconectamos
 		PO_LoginView.desconectarse(driver);
 		// nos volvemos a loggear y entrar a la pagina correcta
@@ -657,11 +654,17 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR29() {
-
-		// accedo a publicaciones
-		PO_Publicaciones.accesoPublicacionesView(driver);
-		// pulso sobre el boton de destacar oferta
+		String email = "testUsuarioPR29@email.com";
+		String password = "123456";
 		String nombreOferta = "Oferta1";
+		// inserto un usuario con menos del dinero adecuado
+		db.insertUser(email, null, "Nombre", "apellido", 15);
+		// inserto una oferta pa la prueba
+		db.insertOferta(nombreOferta, "detalles de la oferta del test 29", new Date(), email, 10, false, false);
+		// accedo a publicaciones
+		PO_Publicaciones.accesoPublicacionesView(driver, email, password);
+		// pulso sobre el boton de destacar oferta
+
 		// TODO acabar destacarOferta()
 		PO_Publicaciones.destacarOferta(driver, nombreOferta);
 		// compruebo que el dinero no se actualiza
@@ -669,10 +672,11 @@ public class SdiEntrega2Tests {
 		// compruebo que la oferta no se ha actualizado
 		PO_Publicaciones.checkDestacada(driver, nombreOferta, false);
 		// compruebo que sale el mensaje de error
-		String errMsg = "ERROR";// TODO esto va a cambiar por el que pongamos
+		String errMsg = "No tienes suficiente dinero para destacar esta oferta";
 		PO_View.checkElement(driver, "text", errMsg);
 
-		assertTrue("PR29 sin hacer", false);
+		// borro el usuario de la BD
+		db.deleteUser(email);
 	}
 
 	/**
@@ -753,11 +757,11 @@ public class SdiEntrega2Tests {
 		String mensaje = "Mensaje de prueba test PR34";
 //		\\creo un uuid para asegurarme q siempre sea una oferta con nombre distinto
 		String nombreOferta = UUID.randomUUID().toString();
-		//inicio sesion como pablo2
-		PO_AgregarOfertasView.accesoAgregarOfertasView(driver,"pablo2@email.com","12345678");
-		//creo una oferta nueva
-		PO_AgregarOfertasView.fillForm(driver, nombreOferta  , "OfertaPablo2TEST", 6, false);
-		
+		// inicio sesion como pablo2
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver, "pablo2@email.com", "12345678");
+		// creo una oferta nueva
+		PO_AgregarOfertasView.fillForm(driver, nombreOferta, "OfertaPablo2TEST", 6, false);
+
 		// borro el test de la base de datos antes de empezarlo
 		db.deleteMessageByContenido(mensaje);
 		// vamos a la vista de las ofertas
@@ -797,15 +801,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR36() {
-		//saco de la base de datos las conversaciones que deberian de aparecer para ese usuario
+		// saco de la base de datos las conversaciones que deberian de aparecer para ese
+		// usuario
 		int total = db.getMessagesUser("pablo@email.com").size();
 		// vamos a la vista de las ofertas
 		PO_ChatWidget.accesoChatView(driver, "pablo@email.com", "12345678");
 		int expectedValue = total;
-		//comprobamos que hay tantos chats como deberia
-		PO_ChatWidget.checkNumberOfChatsInView(driver,expectedValue);
-		
-		
+		// comprobamos que hay tantos chats como deberia
+		PO_ChatWidget.checkNumberOfChatsInView(driver, expectedValue);
+
 	}
 
 	/**
@@ -814,6 +818,7 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR37() {
+
 		assertTrue("PR31 sin hacer", false);
 	}
 

@@ -15,8 +15,12 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class PO_Publicaciones {
 
 	public static void accesoPublicacionesView(WebDriver driver) {
+		accesoPublicacionesView(driver, "testprueba1@gmail.com", "123456");
+	}
+
+	public static void accesoPublicacionesView(WebDriver driver, String email, String password) {
 //		nos loggeamos
-		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
+		PO_PrivateView.login(driver, email, password);
 		// COmprobamos que entramos en la pagina privada de Alumno
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaTienda");
@@ -24,6 +28,7 @@ public class PO_Publicaciones {
 		PO_NavView.clickOption(driver, "publicaciones", "id", "testVistaPublicaciones");
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaPublicaciones");
+		
 	}
 
 	public static void checkNumberOfPublicacionesOnList(WebDriver driver, int expectedSize) {
