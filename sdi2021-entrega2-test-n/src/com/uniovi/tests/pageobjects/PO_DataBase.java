@@ -77,7 +77,7 @@ public class PO_DataBase {
 		// Document{{_id=609479cc4b44d8342879cc99, nombre=Oferta 1, detalles=Esta es la
 		// oferta n�mero 1, fecha=4/4/2021 Hora: 1:20, autor=user1@email.com, precio=6,
 		// comprado=true, destacada=null}}
-		for (int i = 0; i < 10; i++) { // usuario
+		for (int i = 0; i < 4; i++) { // usuario
 			for (int j = 0; j < 5; j++) { // oferta
 				ofertas.add(new Document().append("nombre", "Oferta" + j)
 						.append("detalles", "Esta es la oferta numero" + j  +  " del usuario testprueba" + i + "@gmail.com").append("fecha", new Date().toGMTString())
