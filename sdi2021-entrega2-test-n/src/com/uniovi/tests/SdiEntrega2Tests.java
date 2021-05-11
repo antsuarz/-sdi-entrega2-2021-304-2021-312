@@ -633,18 +633,23 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR28() {
+		String email = "testprueba1@gmail.com";
+		String nombreOferta = "OfertaPR28";
+		// inserto una oferta pa la prueba
+		db.insertOferta(nombreOferta, "detalles de la oferta del test 29", new Date(), email, 10, false, false);
+		// saco el dinero inicial del usuario
+		int dinero = db.getDineroUsuario(email);
 		// accedo a publicaciones
 		PO_Publicaciones.accesoPublicacionesView(driver);
-		// pulso sobre el boton de destacar oferta
-		String nombreOferta = "Oferta1";
-		// TODO acabar destacarOferta()
+		// pulso en destacar esa oferta
 		PO_Publicaciones.destacarOferta(driver, nombreOferta);
 		// compruebo que el dinero se actualiza
-		PO_NavView.checkSaldo(driver, 80);
-		// compruebo que la oferta se ha actualizado
-		PO_Publicaciones.checkDestacada(driver, nombreOferta, true);
+		PO_NavView.checkSaldo(driver, dinero - 20);
 
-		assertTrue("PR28 sin hacer", false);
+
+
+		// borro el usuario de la BD
+		db.deleteUser(email);
 	}
 
 	/**
@@ -656,27 +661,25 @@ public class SdiEntrega2Tests {
 	public void PR29() {
 		String email = "testUsuarioPR29@email.com";
 		String password = "123456";
-		String nombreOferta = "Oferta1";
+		String nombreOferta = "OfertaPR29";
+		int saldoUser = 15;
 		// inserto un usuario con menos del dinero adecuado
-		db.insertUser(email, null, "Nombre", "apellido", 15);
+		db.insertUser(email, null, "Nombre", "apellido", saldoUser);
 		// inserto una oferta pa la prueba
 		db.insertOferta(nombreOferta, "detalles de la oferta del test 29", new Date(), email, 10, false, false);
 		// accedo a publicaciones
 		PO_Publicaciones.accesoPublicacionesView(driver, email, password);
 		// pulso sobre el boton de destacar oferta
-
-		// TODO acabar destacarOferta()
 		PO_Publicaciones.destacarOferta(driver, nombreOferta);
 		// compruebo que el dinero no se actualiza
-		PO_NavView.checkSaldo(driver, 100);
-		// compruebo que la oferta no se ha actualizado
-		PO_Publicaciones.checkDestacada(driver, nombreOferta, false);
+		PO_NavView.checkSaldo(driver, saldoUser);
 		// compruebo que sale el mensaje de error
 		String errMsg = "No tienes suficiente dinero para destacar esta oferta";
 		PO_View.checkElement(driver, "text", errMsg);
 
 		// borro el usuario de la BD
 		db.deleteUser(email);
+		
 	}
 
 	/**

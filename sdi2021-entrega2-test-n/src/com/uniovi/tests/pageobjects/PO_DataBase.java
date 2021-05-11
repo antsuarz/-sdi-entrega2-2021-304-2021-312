@@ -471,6 +471,17 @@ new PO_DataBase().showDataOfDB();
 		return mensajesUser;
 	}
 
+	public int getDineroUsuario(String email) {
+		List<Document> users = getUsers();
+		for (Document document : users) {
+			if (document.get("email").equals(email)) {
+				int tmp = Integer.parseInt(document.get("dinero").toString());
+				return tmp;
+			}
+		}
+		throw new InvalidArgumentException("No existe ese email");
+	}
+
 
 
 }
