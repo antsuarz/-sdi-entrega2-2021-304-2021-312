@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
+import com.uniovi.tests.pageobjects.PO_ClienteView;
 import com.uniovi.tests.pageobjects.PO_Compras;
 import com.uniovi.tests.pageobjects.PO_DataBase;
 import com.uniovi.tests.pageobjects.PO_Destacadas;
@@ -60,7 +61,7 @@ public class SdiEntrega2Tests {
 	public void setUp() {
 		navigateUrl(URL, "");
 		db.InitDummyData();
-//		 db.showDataOfDB();
+		 db.showDataOfDB();
 	}
 
 	// Después de cada prueba se borran las cookies del navegador
@@ -186,8 +187,8 @@ public class SdiEntrega2Tests {
 		PO_PrivateView.login(driver, "testprueba1@gmail.com", "invalida");
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaIdentificacion");
-		// assert 
-		
+		// assert
+
 		String errMsg = "La contraseña no coincide con la del usuario identificado";
 		PO_View.checkElement(driver, "text", errMsg);
 
@@ -249,22 +250,20 @@ public class SdiEntrega2Tests {
 	public void PR10() {
 		String text = " Desconectarse";
 		String busqueda = "//*[contains(text(),'" + text + "')]";
-		//compruebo la invisibilidad del elemento
+		// compruebo la invisibilidad del elemento
 		Boolean resultado = (new WebDriverWait(driver, 2))
 				.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(busqueda)));
 		assertTrue(resultado);
-		//compruebo justo lo contrario para asegurar de que si que sale estando conectado
+		// compruebo justo lo contrario para asegurar de que si que sale estando
+		// conectado
 		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
 //		compruebo justo lo contrario
 		try {
-			(new WebDriverWait(driver, 2))
-					.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(busqueda)));
+			(new WebDriverWait(driver, 2)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(busqueda)));
 		} catch (Exception e) {
 			assertTrue(true);
 		}
-		
-		
-		
+
 	}
 
 	/**
@@ -329,7 +328,7 @@ public class SdiEntrega2Tests {
 		// estado inicial correcto
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
 		// borro el usuario colocado arriba del todo en la lista
-		PO_UserListView.deleteUser(driver, usersDBpreBorrado -1);
+		PO_UserListView.deleteUser(driver, usersDBpreBorrado - 1);
 		// vuelvo a sacar en este momento los usuarios de la base de datos
 		int usersDBpostBorrado = db.getUsers().size();
 		// le resto 1 por que el admin no se encuentra en esa lista
@@ -356,7 +355,7 @@ public class SdiEntrega2Tests {
 		// estado inicial correcto
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
 		// borro el usuario colocado arriba del todo en la lista
-		PO_UserListView.deleteUser(driver, 0, 1, usersDBpreBorrado -1);
+		PO_UserListView.deleteUser(driver, 0, 1, usersDBpreBorrado - 1);
 		// vuelvo a sacar en este momento los usuarios de la base de datos
 		int usersDBpostBorrado = db.getUsers().size();
 		// le resto 1 por que el admin no se encuentra en esa lista
@@ -402,7 +401,7 @@ public class SdiEntrega2Tests {
 		PO_AgregarOfertasView.fillForm(driver, "", "OfertaTestDetalles", -1, false);
 		// comprobamos que seguimos en la misma pagina
 		PO_NavView.checkIdOnView(driver, "testVistaOfertasAgregar");
-		//TODO comprobar texto error
+		// TODO comprobar texto error
 
 	}
 
@@ -634,7 +633,18 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR28() {
-		assertTrue("PR29 sin hacer", false);
+		// accedo a publicaciones
+		PO_Publicaciones.accesoPublicacionesView(driver);
+		// pulso sobre el boton de destacar oferta
+		String nombreOferta = "Oferta1";
+		// TODO acabar destacarOferta()
+		PO_Publicaciones.destacarOferta(driver, nombreOferta);
+		// compruebo que el dinero se actualiza
+		PO_NavView.checkSaldo(driver, 80);
+		// compruebo que la oferta se ha actualizado
+		PO_Publicaciones.checkDestacada(driver, nombreOferta, true);
+
+		assertTrue("PR28 sin hacer", false);
 	}
 
 	/**
@@ -644,6 +654,21 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR29() {
+
+		// accedo a publicaciones
+		PO_Publicaciones.accesoPublicacionesView(driver);
+		// pulso sobre el boton de destacar oferta
+		String nombreOferta = "Oferta1";
+		// TODO acabar destacarOferta()
+		PO_Publicaciones.destacarOferta(driver, nombreOferta);
+		// compruebo que el dinero no se actualiza
+		PO_NavView.checkSaldo(driver, 100);
+		// compruebo que la oferta no se ha actualizado
+		PO_Publicaciones.checkDestacada(driver, nombreOferta, false);
+		//compruebo que sale el mensaje de error
+		String errMsg = "ERROR";//TODO esto va a cambiar por el que pongamos
+		PO_View.checkElement(driver, "text", errMsg);
+		
 		assertTrue("PR29 sin hacer", false);
 	}
 
@@ -652,7 +677,12 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR30() {
-		assertTrue("PR30 sin hacer", false);
+
+		// testprueba1@gmail.com ya es anyadido antes de cada prueba
+		PO_ClienteView.login(driver, "testprueba1@gmail.com", "123456", URL);
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testClienteOfertasView");
+
 	}
 
 	/**
@@ -662,7 +692,10 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR31() {
-		assertTrue("PR31 sin hacer", false);
+		// testprueba1@gmail.com ya es anyadido antes de cada prueba
+		PO_ClienteView.login(driver, "testprueba1@gmail.com", "invalida", URL);
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testClienteOfertasView");
 	}
 
 	/**
