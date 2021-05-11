@@ -50,6 +50,7 @@ public class PO_OfertasWidget {
 			
 		}
 		
+		
 		PO_View.checkElement(driver, "text", nombre);
 	
 	}

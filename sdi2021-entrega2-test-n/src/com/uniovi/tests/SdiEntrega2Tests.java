@@ -646,8 +646,6 @@ public class SdiEntrega2Tests {
 		// compruebo que el dinero se actualiza
 		PO_NavView.checkSaldo(driver, dinero - 20);
 
-
-
 		// borro el usuario de la BD
 		db.deleteUser(email);
 	}
@@ -679,7 +677,7 @@ public class SdiEntrega2Tests {
 
 		// borro el usuario de la BD
 		db.deleteUser(email);
-		
+
 	}
 
 	/**
@@ -822,7 +820,15 @@ public class SdiEntrega2Tests {
 	@Test
 	public void PR37() {
 
-		assertTrue("PR31 sin hacer", false);
+		
+		// vamos a la vista de chats
+		PO_ChatWidget.accesoChatView(driver, "pablo2@email.com", "12345678");
+		//cojemos el nombre de la primera
+		String nombreOferta = PO_ChatWidget.getFirstChat(driver);
+		//eliminamos la primera
+		PO_ChatWidget.deleteChat(driver, nombreOferta);
+		//comprobamos que ya no esta
+		PO_ChatWidget.checkInvisibilityOf(driver,nombreOferta);
 	}
 
 	/**
@@ -831,7 +837,14 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR38() {
-		assertTrue("PR31 sin hacer", false);
+		// vamos a la vista de chats
+		PO_ChatWidget.accesoChatView(driver, "pablo2@email.com", "12345678");
+		//cojemos el nombre de la ultima
+		String nombreOferta = PO_ChatWidget.getLastChat(driver);
+		//eliminamos la ultima
+		PO_ChatWidget.deleteChat(driver, nombreOferta);
+		//comprobamos que ya no esta
+		PO_ChatWidget.checkInvisibilityOf(driver,nombreOferta);
 	}
 
 	/**
@@ -842,7 +855,39 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR39() {
-		assertTrue("PR31 sin hacer", false);
+		// CREO LA OFERTA DEL USUARIO PABLO 2
+		// quito los usuarios de test para probar esta parte
+		db.ResetDummyData();
+		String mensaje = "Mensaje de prueba test PR39";
+//		\\creo un uuid para asegurarme q siempre sea una oferta con nombre distinto
+		String nombreOferta = UUID.randomUUID().toString();
+		String password = "12345678";
+		// inicio sesion como pablo2
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver, "pablo2@email.com", password);
+		// creo una oferta nueva
+		PO_AgregarOfertasView.fillForm(driver, nombreOferta, "OfertaPablo2TEST", 6, false);
+
+		// INICIO CONVERSACION DESDE PABLO
+		// borro el test de la base de datos antes de empezarlo
+		db.deleteMessageByContenido(mensaje);// comprobaciones porsiacaso
+		// vamos a la vista de las ofertas
+		PO_OfertasWidget.accesoOfertasWidget(driver, "pablo@email.com", password);
+		// vamos al chat correspondiente
+		PO_OfertasWidget.clickChatOferta(driver, nombreOferta);
+		// comprobamos que estamos en la vista del chat
+		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
+		// envio el mensaje alavez que lo compruebo
+		PO_ChatWidget.sendMessage(driver, mensaje);
+
+		// COMPRUEBO LA CONVERSACION DESDE PABLO 2
+		// vamos a la vista de chats
+		PO_ChatWidget.accesoChatView(driver, "pablo2@email.com", password);
+		// vamos al chat correspondiente
+		PO_ChatWidget.clickChatOferta(driver, nombreOferta);
+		// comprobamos que estamos en la vista del chat
+		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
+		// compruebo que tengo el mensaje
+		PO_View.checkElement(driver, "text", mensaje);
 	}
 
 	/**
@@ -853,7 +898,45 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR40() {
-		assertTrue("PR31 sin hacer", false);
+		// CREO LA OFERTA DEL USUARIO PABLO 2
+		// quito los usuarios de test para probar esta parte
+		db.ResetDummyData();
+		String mensaje = "Mensaje de prueba test PR40";
+//		\\creo un uuid para asegurarme q siempre sea una oferta con nombre distinto
+		String nombreOferta = UUID.randomUUID().toString();
+		String password = "12345678";
+		// inicio sesion como pablo2
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver, "pablo2@email.com", password);
+		// creo una oferta nueva
+		PO_AgregarOfertasView.fillForm(driver, nombreOferta, "OfertaPablo2TEST", 6, false);
+
+		// INICIO CONVERSACION DESDE PABLO
+		// borro el test de la base de datos antes de empezarlo
+		db.deleteMessageByContenido(mensaje);// comprobaciones porsiacaso
+		// vamos a la vista de las ofertas
+		PO_OfertasWidget.accesoOfertasWidget(driver, "pablo@email.com", password);
+		// vamos al chat correspondiente
+		PO_OfertasWidget.clickChatOferta(driver, nombreOferta);
+		// comprobamos que estamos en la vista del chat
+		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
+		// envio los mensajes alavez que lo compruebo
+		for (int i = 0; i < 3; i++) {
+			PO_ChatWidget.sendMessage(driver, mensaje + "(numero " + i+" )");
+		}
+		
+
+		// COMPRUEBO LA CONVERSACION DESDE PABLO 2
+		// vamos a la vista de chats
+		PO_ChatWidget.accesoChatView(driver, "pablo2@email.com", password);
+		// vamos al chat correspondiente
+		PO_ChatWidget.clickChatOferta(driver, nombreOferta);
+		// comprobamos que estamos en la vista del chat
+		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
+		// compruebo que tengo los mensajes
+		for (int i = 0; i < 3; i++) {
+			PO_View.checkElement(driver, "text", mensaje + "(numero " + i+" )");
+		}
+		
 	}
 
 }
