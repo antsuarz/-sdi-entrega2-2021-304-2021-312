@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.bson.Document;
 import org.openqa.selenium.InvalidArgumentException;
+import org.openqa.selenium.WebElement;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -22,17 +23,34 @@ import com.mongodb.client.MongoIterable;
 
 public class PO_DataBase {
 
-//	public static void main(String[] args) {
-//		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
-////		new PO_DataBase().deleteUser("pablo2@email.com");
-////		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
-////			
-////			insertUser(mongoclient, "pablo2@email.com", null, "Pablo2", "Apellido", 100);
-////		} catch (Exception e) {
-////		}
-////		System.out.println("COMPLETADO");
-//		new PO_DataBase().showDataOfDB();
-//	}
+	private static String connectionString = "mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:27017,tiendamusica-shard-00-01.jxgw2.mongodb.net:27017,tiendamusica-shard-00-02.jxgw2.mongodb.net:27017/myWallapop?ssl=true&replicaSet=atlas-od6pn1-shard-0&authSource=admin&retryWrites=true&w=majority";
+	private static String AppDBname = "myWallapop";
+	private static List<Document> usuarios = new ArrayList<Document>();
+	private static List<Document> ofertas = new ArrayList<Document>();
+	private static List<Document> compras = new ArrayList<Document>();
+	private static List<Document> mensajes = new ArrayList<Document>();
+
+	public PO_DataBase() {
+		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
+		insertUsers();
+		insertOfertas();
+//		insertCompras();
+//		insertMensajes(getRandomUserEmail(), getRandomUserId());
+		
+	}
+
+	public static void main(String[] args) {
+//Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
+////new PO_DataBase().deleteUser("pablo2@email.com");
+////try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+////	
+////	insertUser(mongoclient, "pablo2@email.com", null, "Pablo2", "Apellido", 100);
+////} catch (Exception e) {
+////}
+////System.out.println("COMPLETADO");
+//new PO_DataBase().InitDummyData();
+new PO_DataBase().showDataOfDB();
+}
 
 	@SuppressWarnings("unused")
 	private static void insertCompra(MongoClient mongoclient) {
@@ -73,21 +91,6 @@ public class PO_DataBase {
 
 	}
 
-	private static String connectionString = "mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:27017,tiendamusica-shard-00-01.jxgw2.mongodb.net:27017,tiendamusica-shard-00-02.jxgw2.mongodb.net:27017/myWallapop?ssl=true&replicaSet=atlas-od6pn1-shard-0&authSource=admin&retryWrites=true&w=majority";
-	private static String AppDBname = "myWallapop";
-	private static List<Document> usuarios = new ArrayList<Document>();
-	private static List<Document> ofertas = new ArrayList<Document>();
-	private static List<Document> compras = new ArrayList<Document>();
-	private static List<Document> mensajes = new ArrayList<Document>();
-
-	public PO_DataBase() {
-		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
-		insertUsers();
-		insertOfertas();
-		insertCompras();
-		insertMensajes(getRandomUserEmail(), getRandomUserId());
-	}
-
 	private String getRandomUserEmail() {
 		String id = "";
 
@@ -124,7 +127,7 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteOne(new Document("email", email));
-			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteOne(new Document("emisor", email));
+			mongoclient.getDatabase(AppDBname).getCollection("mensajes").deleteOne(new Document("emisor", email));
 		} catch (Exception e) {
 		}
 	}
@@ -249,17 +252,21 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("test", true));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("test", true));
+			mongoclient.getDatabase(AppDBname).getCollection("mensajes").deleteMany(new Document("test", true));
 			String email;
 			for (int i = 0; i < 10; i++) {
 				email = "testprueba" + i + "@gmail.com";// "autor" usuario
 				mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("email", email));
 				mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
 				mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
+				mongoclient.getDatabase(AppDBname).getCollection("mensajes").deleteMany(new Document("emisor", email));
 			}
 			email = "prueba1@prueba1.com";
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteMany(new Document("email", email));
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
+			mongoclient.getDatabase(AppDBname).getCollection("mensajes").deleteMany(new Document("emisor", email));
+			
 		} catch (Exception e) {
 		}
 	}
@@ -349,6 +356,10 @@ public class PO_DataBase {
 	public List<Document> getCompras() {
 		return getCollection("compras");
 	}
+	
+	public List<Document> getMensajes() {
+		return getCollection("mensajes");
+	}
 
 	public List<Document> getCollection(String collection) {
 		List<Document> tmp = new ArrayList<Document>();
@@ -413,6 +424,30 @@ public class PO_DataBase {
 			}
 		}
 		throw new InvalidArgumentException("No existe ese email");
+	}
+
+	public void deleteMessageByContenido(String contenido) {
+		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteOne(new Document("contenido",contenido));
+
+		} catch (Exception e) {
+		}
+		
+	}
+
+	public List<Document> getMessagesUser(String emailUser) {
+		String id = getIdUser(emailUser);
+		// Document{{_id=609a0d487c436568a8bb7816, contenido=hola muy buenas,
+		// fecha=11/5/2021 Hora: 6:51, emisor=pablo2@email.com,
+		// conversacion=609a0d487c436568a8bb7815, leido=false}}
+		List<Document>mensajes = getMensajes();
+		List<Document>mensajesUser = new ArrayList<Document>();
+		for (Document document : mensajes) {
+			if (document.get("conversacion").toString().equals(id)) {
+				mensajesUser.add(document);
+			}
+		}
+		return mensajesUser;
 	}
 
 }

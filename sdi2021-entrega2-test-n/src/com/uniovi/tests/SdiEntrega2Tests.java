@@ -3,6 +3,8 @@ package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.UUID;
+
 //Paquetes JUnit 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -19,6 +21,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.uniovi.tests.pageobjects.PO_AgregarOfertasView;
+import com.uniovi.tests.pageobjects.PO_ChatWidget;
 import com.uniovi.tests.pageobjects.PO_ClienteView;
 import com.uniovi.tests.pageobjects.PO_Compras;
 import com.uniovi.tests.pageobjects.PO_DataBase;
@@ -62,7 +65,7 @@ public class SdiEntrega2Tests {
 	public void setUp() {
 		navigateUrl(URL, "");
 		db.InitDummyData();
-//		 db.showDataOfDB();
+		 db.showDataOfDB();
 	}
 
 	// Después de cada prueba se borran las cookies del navegador
@@ -666,10 +669,10 @@ public class SdiEntrega2Tests {
 		PO_NavView.checkSaldo(driver, 100);
 		// compruebo que la oferta no se ha actualizado
 		PO_Publicaciones.checkDestacada(driver, nombreOferta, false);
-		//compruebo que sale el mensaje de error
-		String errMsg = "ERROR";//TODO esto va a cambiar por el que pongamos
+		// compruebo que sale el mensaje de error
+		String errMsg = "ERROR";// TODO esto va a cambiar por el que pongamos
 		PO_View.checkElement(driver, "text", errMsg);
-		
+
 		assertTrue("PR29 sin hacer", false);
 	}
 
@@ -697,7 +700,7 @@ public class SdiEntrega2Tests {
 		PO_ClienteView.login(driver, "testprueba1@gmail.com", "invalida", URL);
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testClienteView");
-		//compruebo que sale el mensaje de error
+		// compruebo que sale el mensaje de error
 		String errMsg = "La contraseña introducida es incorrecta";
 		PO_View.checkElement(driver, "text", errMsg);
 	}
@@ -709,12 +712,12 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR32() {
-		
+
 		// testprueba1@gmail.com ya es anyadido antes de cada prueba
 		PO_ClienteView.login(driver, "", "", URL);
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testClienteView");
-		//compruebo que sale el mensaje de error
+		// compruebo que sale el mensaje de error
 		String errMsg = "El campo email no puede estar vacio";
 		PO_View.checkElement(driver, "text", errMsg);
 		errMsg = "El campo contraseña no puede estar vacio";
@@ -727,15 +730,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR33() {
-		//sacamos las ofertas que deberia tener ese usuario
+		// sacamos las ofertas que deberia tener ese usuario
 		int ofertasUsuario = db.getOfertasUser("testprueba1@gmail.com").size();
 		int ofertas = db.getOfertas().size();
 		int total = ofertas - ofertasUsuario;
-		//vamos a la vista correspondiente para contar las ofertas del usuario
+		// vamos a la vista correspondiente para contar las ofertas del usuario
 		PO_OfertasWidget.accesoOfertasWidget(driver);
-		//comprobamos que tenga tantos elementos como ofertas para ese usuario
-		PO_OfertasWidget.checkSizeOfOfertas(driver,total);
-		
+		// comprobamos que tenga tantos elementos como ofertas para ese usuario
+		PO_OfertasWidget.checkSizeOfOfertas(driver, total);
+
 	}
 
 	/**
@@ -746,7 +749,27 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR34() {
-		assertTrue("PR31 sin hacer", false);
+		// quito los usuarios de test para probar esta parte
+		db.ResetDummyData();
+		String mensaje = "Mensaje de prueba test PR34";
+//		\\creo un uuid para asegurarme q siempre sea una oferta con nombre distinto
+		String nombreOferta = UUID.randomUUID().toString();
+		//inicio sesion como pablo2
+		PO_AgregarOfertasView.accesoAgregarOfertasView(driver,"pablo2@email.com","123456");
+		//creo una oferta nueva
+		PO_AgregarOfertasView.fillForm(driver, nombreOferta  , "OfertaPablo2TEST", 6, false);
+		
+		// borro el test de la base de datos antes de empezarlo
+		db.deleteMessageByContenido(mensaje);
+		// vamos a la vista de las ofertas
+		PO_OfertasWidget.accesoOfertasWidget(driver, "pablo@email.com", "12345678");
+		// vamos al chat correspondiente
+		PO_OfertasWidget.clickChatOferta(driver, nombreOferta);
+		// comprobamos que estamos en la vista del chat
+		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
+		// envio el mensaje alavez que lo compruebo
+		PO_ChatWidget.sendMessage(driver, mensaje);
+
 	}
 
 	/**
@@ -756,7 +779,17 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR35() {
-		assertTrue("PR31 sin hacer", false);
+		// quito los usuarios de test para probar esta parte
+		db.ResetDummyData();
+		String mensaje = "Mensaje de prueba test PR35";
+		// vamos a la vista de las ofertas
+		PO_OfertasWidget.accesoOfertasWidget(driver, "pablo@email.com", "12345678");
+		// vamos al chat correspondiente
+		PO_OfertasWidget.clickChatOferta(driver, "OfertaPablo2");
+		// comprobamos que estamos en la vista del chat
+		PO_NavView.checkIdOnView(driver, "testWidgetChatView");
+		// envio el mensaje alavez que lo compruebo
+		PO_ChatWidget.sendMessage(driver, mensaje);
 	}
 
 	/**
@@ -765,7 +798,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR36() {
-		assertTrue("PR31 sin hacer", false);
+		//saco de la base de datos las conversaciones que deberian de aparecer para ese usuario
+		int total = db.getMessagesUser("pablo@email.com").size();
+		// vamos a la vista de las ofertas
+		PO_ChatWidget.accesoChatView(driver, "pablo@email.com", "12345678");
+		int expectedValue = total;
+		//comprobamos que hay tantos chats como deberia
+		PO_ChatWidget.checkNumberOfChatsInView(driver,expectedValue);
+		
+		
 	}
 
 	/**
