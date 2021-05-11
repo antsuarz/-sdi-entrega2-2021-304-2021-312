@@ -305,7 +305,8 @@ module.exports = function (app, swig, gestorBD, logger) {
         }
         gestorBD.obtenerUsuarios(criterio, function (usuario){
             if(usuario == null || usuario.length == 0){
-                return;
+               return ;
+                // res.send('Ha ocurrido un error inesperado');
             }
             else{
                 let criterioEliminarOfertas={

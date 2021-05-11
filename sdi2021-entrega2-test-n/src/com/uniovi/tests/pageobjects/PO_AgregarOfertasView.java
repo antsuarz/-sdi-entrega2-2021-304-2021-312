@@ -9,8 +9,12 @@ import org.openqa.selenium.WebElement;
 public class PO_AgregarOfertasView {
 
 	public static void accesoAgregarOfertasView(WebDriver driver) {
+		accesoAgregarOfertasView(driver, "testprueba1@gmail.com", "123456");
+
+	}
+	public static void accesoAgregarOfertasView(WebDriver driver,String email,String password) {
 //		nos loggeamos
-		PO_PrivateView.login(driver, "testprueba1@gmail.com", "123456");
+		PO_PrivateView.login(driver, email, password);
 		// COmprobamos que entramos en la pagina privada de Alumno
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaTienda");
@@ -65,8 +69,8 @@ public class PO_AgregarOfertasView {
 		if (destacadap) {
 			WebElement destacada = driver.findElement(By.name("destacada"));
 			destacada.click();
-			destacada.clear();
-			destacada.click();
+//			destacada.clear();
+//			destacada.click();
 		}
 
 		// Pulsar el boton de Alta.

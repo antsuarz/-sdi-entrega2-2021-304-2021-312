@@ -151,6 +151,7 @@ module.exports = function(app, swig, gestorBD, logger) {
                     user: req.session.usuario,
                     dinero: req.session.dinero,
                     admin: req.session.admin,
+                    ultimaPg: ultimaPg
                 });
                 res.send(respuesta);
                 logger.info("Cargando la tienda");
