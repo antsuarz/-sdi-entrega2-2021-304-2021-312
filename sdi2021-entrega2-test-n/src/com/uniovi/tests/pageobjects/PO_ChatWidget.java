@@ -45,7 +45,7 @@ public class PO_ChatWidget {
 		List<WebElement> chats = SeleniumUtils.EsperaCargaPagina(driver, "free", "//tbody/tr", PO_View.getTimeout());
 		System.out.println(chats.size());
 		System.out.println(expectedValue);
-		assertTrue(chats.size() == expectedValue);
+		assertTrue(chats.size() >= expectedValue);
 	}
 
 }
