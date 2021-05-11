@@ -46,7 +46,7 @@
         {% if user != null && admin != 'admin' %}
         <li id="mEmail"><a>Email: {{user}}</a></li>
         {% endif %}
-        {% if (dinero > -1 || dinero == 0) && admin != 'admin' %}
+        {% if dinero > -1  && admin != 'admin' && user != null %}
         <li id="mDinero"><a>Dinero: {{dinero}} €</a></li>
         {% endif %}
         {% if user != null%}

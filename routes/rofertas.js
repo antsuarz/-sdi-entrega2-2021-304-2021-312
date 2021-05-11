@@ -225,11 +225,11 @@ module.exports = function(app, swig, gestorBD, logger) {
                                             logger.error("Se ha producido intentando identificar al usuario");
                                         } else {
                                             if(dineroActual == 0){
-                                                req.session.ususario = usuarios[0].email;
+                                                req.session.usuario = usuarios[0].email;
                                                 req.session.dinero = 0;
                                             }
                                             else{
-                                                req.session.dinero = dineroActual;
+                                                req.session.dinero = dineroActual.dinero;
                                             }
                                             logger.info("Se ha destacado la oferta con éxito");
                                             res.redirect("/publicaciones");
