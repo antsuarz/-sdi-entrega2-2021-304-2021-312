@@ -26,6 +26,7 @@ import com.uniovi.tests.pageobjects.PO_Destacadas;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
+import com.uniovi.tests.pageobjects.PO_OfertasWidget;
 import com.uniovi.tests.pageobjects.PO_PrivateView;
 import com.uniovi.tests.pageobjects.PO_Publicaciones;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
@@ -61,7 +62,7 @@ public class SdiEntrega2Tests {
 	public void setUp() {
 		navigateUrl(URL, "");
 		db.InitDummyData();
-		 db.showDataOfDB();
+//		 db.showDataOfDB();
 	}
 
 	// Después de cada prueba se borran las cookies del navegador
@@ -695,17 +696,29 @@ public class SdiEntrega2Tests {
 		// testprueba1@gmail.com ya es anyadido antes de cada prueba
 		PO_ClienteView.login(driver, "testprueba1@gmail.com", "invalida", URL);
 		// assert que estamos en la pagina correcta
-		PO_NavView.checkIdOnView(driver, "testClienteOfertasView");
+		PO_NavView.checkIdOnView(driver, "testClienteView");
+		//compruebo que sale el mensaje de error
+		String errMsg = "La contraseña introducida es incorrecta";
+		PO_View.checkElement(driver, "text", errMsg);
 	}
 
 	/**
-	 * [Prueba32] Inicio de sesión con datos válidos (campo email o contraseña
+	 * [Prueba32] Inicio de sesión con datos inválidos (campo email o contraseña
 	 * vacíos).
 	 * 
 	 */
 	@Test
 	public void PR32() {
-		assertTrue("PR31 sin hacer", false);
+		
+		// testprueba1@gmail.com ya es anyadido antes de cada prueba
+		PO_ClienteView.login(driver, "", "", URL);
+		// assert que estamos en la pagina correcta
+		PO_NavView.checkIdOnView(driver, "testClienteView");
+		//compruebo que sale el mensaje de error
+		String errMsg = "El campo email no puede estar vacio";
+		PO_View.checkElement(driver, "text", errMsg);
+		errMsg = "El campo contraseña no puede estar vacio";
+		PO_View.checkElement(driver, "text", errMsg);
 	}
 
 	/**
@@ -714,7 +727,15 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR33() {
-		assertTrue("PR31 sin hacer", false);
+		//sacamos las ofertas que deberia tener ese usuario
+		int ofertasUsuario = db.getOfertasUser("testprueba1@gmail.com").size();
+		int ofertas = db.getOfertas().size();
+		int total = ofertas - ofertasUsuario;
+		//vamos a la vista correspondiente para contar las ofertas del usuario
+		PO_OfertasWidget.accesoOfertasWidget(driver);
+		//comprobamos que tenga tantos elementos como ofertas para ese usuario
+		PO_OfertasWidget.checkSizeOfOfertas(driver,total);
+		
 	}
 
 	/**

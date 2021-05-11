@@ -22,32 +22,32 @@ import com.mongodb.client.MongoIterable;
 
 public class PO_DataBase {
 
-	
 //	public static void main(String[] args) {
 //		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
-//		new PO_DataBase().deleteUser("pablo2@email.com");
-//		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
-//			
-//			insertUser(mongoclient, "pablo2@email.com", null, "Pablo2", "Apellido", 100);
-//		} catch (Exception e) {
-//		}
-//		System.out.println("COMPLETADO");
-//		
+////		new PO_DataBase().deleteUser("pablo2@email.com");
+////		try (MongoClient mongoclient = MongoClients.create(connectionString)) {
+////			
+////			insertUser(mongoclient, "pablo2@email.com", null, "Pablo2", "Apellido", 100);
+////		} catch (Exception e) {
+////		}
+////		System.out.println("COMPLETADO");
+//		new PO_DataBase().showDataOfDB();
 //	}
 
 	@SuppressWarnings("unused")
-	private static  void insertCompra(MongoClient mongoclient) {
+	private static void insertCompra(MongoClient mongoclient) {
 		mongoclient.getDatabase(AppDBname).getCollection("compras").insertMany(compras);
 	}
 
 	@SuppressWarnings("unused")
-	private static  void insertOferta(MongoClient mongoclient) {
+	private static void insertOferta(MongoClient mongoclient) {
 		mongoclient.getDatabase(AppDBname).getCollection("ofertas").insertMany(ofertas);
 
 	}
 
-	private static void insertUser(MongoClient mongoclient, String email, String password, String nombre, String apellido,
-			Integer dinero) {
+	@SuppressWarnings("unused")
+	private static void insertUser(MongoClient mongoclient, String email, String password, String nombre,
+			String apellido, Integer dinero) {
 
 		String defaultEmail = "aaaaaaa@gmail.com";
 		String defaultPassword = "6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a";// 123456
@@ -55,17 +55,21 @@ public class PO_DataBase {
 		String defaultApellido = "test";
 		Integer defaultDinero = 100;
 
-		if (email == null)	email = defaultEmail;
-		if (password == null)	password = defaultPassword;
-		if (nombre == null)	nombre = defaultNombre;
-		if (apellido == null)	apellido = defaultApellido;
-		if (dinero == null)	dinero = defaultDinero;
+		if (email == null)
+			email = defaultEmail;
+		if (password == null)
+			password = defaultPassword;
+		if (nombre == null)
+			nombre = defaultNombre;
+		if (apellido == null)
+			apellido = defaultApellido;
+		if (dinero == null)
+			dinero = defaultDinero;
 
 		Document usuario = (new Document("email", email).append("password", password).append("nombre", nombre)
 				.append("apellido", apellido).append("dinero", dinero).append("test", false));
 
 		mongoclient.getDatabase(AppDBname).getCollection("usuarios").insertOne(usuario);
-
 
 	}
 
@@ -74,11 +78,45 @@ public class PO_DataBase {
 	private static List<Document> usuarios = new ArrayList<Document>();
 	private static List<Document> ofertas = new ArrayList<Document>();
 	private static List<Document> compras = new ArrayList<Document>();
+	private static List<Document> mensajes = new ArrayList<Document>();
 
 	public PO_DataBase() {
+		Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
 		insertUsers();
 		insertOfertas();
 		insertCompras();
+		insertMensajes(getRandomUserEmail(), getRandomUserId());
+	}
+
+	private String getRandomUserEmail() {
+		String id = "";
+
+		List<Document> usrs = getUsers();
+		id = (String) usrs.get(new Random().nextInt(usrs.size())).get("email");
+
+		return id;
+	}
+
+	private String getRandomUserId() {
+
+		String id = "";
+
+		List<Document> usrs = usuarios;
+		id = (String) usrs.get(new Random().nextInt(usrs.size())).get("_id");
+
+		return id;
+	}
+
+	@SuppressWarnings("deprecation")
+	private void insertMensajes(String emisor, String conversacion) {
+		for (int i = 0; i < 5; i++) {
+			// Document{{_id=609a0d487c436568a8bb7816, contenido=hola muy buenas,
+			// fecha=11/5/2021 Hora: 6:51, emisor=pablo2@email.com,
+			// conversacion=609a0d487c436568a8bb7815, leido=false}}
+			mensajes.add(new Document().append("contenido", "contenido de un mensaje random")
+					.append("fecha", new Date().toGMTString()).append("emisor", emisor)
+					.append("conversacion", conversacion).append("leido", false).append("test", true));
+		}
 	}
 
 	public void deleteUser(String email) {
@@ -86,6 +124,7 @@ public class PO_DataBase {
 			mongoclient.getDatabase(AppDBname).getCollection("ofertas").deleteMany(new Document("autor", email));
 			mongoclient.getDatabase(AppDBname).getCollection("compras").deleteMany(new Document("usuario", email));
 			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteOne(new Document("email", email));
+			mongoclient.getDatabase(AppDBname).getCollection("usuarios").deleteOne(new Document("emisor", email));
 		} catch (Exception e) {
 		}
 	}
@@ -98,6 +137,7 @@ public class PO_DataBase {
 		usuarios.add(new Document("email", "aaaaaaa@gmail.com")
 				.append("password", "6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a")// 123456
 				.append("nombre", "aaaaaaa").append("apellido", "test").append("dinero", 100).append("test", true));
+
 		usuarios.add(new Document("email", "zzzzzzzz@gmail.com")
 				.append("password", "6fabd6ea6f1518592b7348d84a51ce97b87e67902aa5a9f86beea34cd39a6b4a")// 123456
 				.append("nombre", "zzzzzzzz").append("apellido", "test").append("dinero", 100).append("test", true));
