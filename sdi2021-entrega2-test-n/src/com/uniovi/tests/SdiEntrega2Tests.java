@@ -65,7 +65,7 @@ public class SdiEntrega2Tests {
 	public void setUp() {
 		navigateUrl(URL, "");
 		db.InitDummyData();
-		 db.showDataOfDB();
+//		 db.showDataOfDB();
 	}
 
 	// Después de cada prueba se borran las cookies del navegador
@@ -83,7 +83,7 @@ public class SdiEntrega2Tests {
 		PO_View.setTimeout(3);
 		db = new PO_DataBase();
 		// DEBUG mostrar los datos de la Base de datos
-//		db.showDataOfDB();
+		db.showDataOfDB();
 
 	}
 
@@ -93,19 +93,6 @@ public class SdiEntrega2Tests {
 		driver.quit();
 	}
 
-//	@Test
-//	public void Prueba00Conexion() {
-//
-//		System.out.println(driver.getCurrentUrl());
-//		System.out.println();
-//		WebElement prueba = driver.findElement(By.id("prueba"));
-//		System.out.println("-------------------");
-//		System.out.println(prueba.getText());
-//		assertEquals(prueba.getText(), "Wallapop App");
-//
-////	WebElement we = driver.getTitle();
-//
-//	}
 
 	/**
 	 * [Prueba1] Registro de Usuario con datos válidos.
@@ -114,7 +101,7 @@ public class SdiEntrega2Tests {
 	public void PR01() {
 
 		String email = "usarioPrueba@prueba.com";
-		String password = "123456";
+		String password = "12345678";
 		db.deleteUser(email);
 		PO_RegisterView.registerUser(driver, email, password);
 		// assert
@@ -142,7 +129,7 @@ public class SdiEntrega2Tests {
 	 */
 	@Test
 	public void PR03() {
-		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "123456", "aaaa", "Nombre", "Apellido");
+		PO_RegisterView.registerUser(driver, "usarioPrueba@prueba.com", "12345678", "aaaa", "Nombre", "Apellido");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
 		// mensaje conraseña invalida
@@ -157,7 +144,7 @@ public class SdiEntrega2Tests {
 	@Test
 	public void PR04() {
 		// testprueba1@gmail.com ya es anyadido antes de cada prueba
-		PO_RegisterView.registerUser(driver, "testprueba1@gmail.com", "123456");
+		PO_RegisterView.registerUser(driver, "testprueba1@gmail.com", "12345678");
 		// assert
 		PO_NavView.checkIdOnView(driver, "testVistaRegistro");
 		// assert
@@ -359,13 +346,17 @@ public class SdiEntrega2Tests {
 		// estado inicial correcto
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpreBorrado);
 		// borro el usuario colocado arriba del todo en la lista
-		PO_UserListView.deleteUser(driver, 0, 1, usersDBpreBorrado - 1);
+		PO_UserListView.deleteUser(driver, 1, 7, usersDBpreBorrado - 1);
 		// vuelvo a sacar en este momento los usuarios de la base de datos
 		int usersDBpostBorrado = db.getUsers().size();
 		// le resto 1 por que el admin no se encuentra en esa lista
 		usersDBpostBorrado--;
 		// asserto de la base de datos
 		assertEquals(usersDBpreBorrado - 3, usersDBpostBorrado);
+		//nos desconectamos para ver que aun funciona
+		PO_LoginView.desconectarse(driver);
+		// vamos a la lista de usuarios
+		PO_UserListView.accesoUserList(driver);
 		// asserto de la web
 		PO_UserListView.checkNumberOfUsersOnList(driver, usersDBpostBorrado);
 	}

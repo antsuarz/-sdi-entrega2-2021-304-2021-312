@@ -143,6 +143,7 @@ module.exports = function(app, swig, gestorBD) {
                     user: req.session.usuario,
                     dinero: req.session.dinero,
                     admin: req.session.admin,
+                    ultimaPg: ultimaPg
                 });
                 res.send(respuesta);
             }

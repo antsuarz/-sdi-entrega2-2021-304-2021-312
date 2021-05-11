@@ -29,7 +29,7 @@ public class PO_TiendaView {
 				// sacamos la cantidad de ofertas que tiene ese usuario en la base de datos
 				int numeroDeOfertasUsuario = PO_Publicaciones.getOfertas(db);
 				// calculamos las ofertas para ese usuario
-				int numeroOfertasParaElUsuario = db.getOfertas().size() - numeroDeOfertasUsuario;
+				int numeroOfertasParaElUsuario = db.getOfertas().size() - 1;
 //				System.out.println(numeroDeOfertasUsuario);
 //				System.out.println(numeroOfertasParaElUsuario);
 				// iniciamos un contador para ir contando ofertas
@@ -62,8 +62,10 @@ public class PO_TiendaView {
 		busqueda.clear();
 		busqueda.sendKeys(busquedap);
 		//pulsamos el boton de busqueda
-		List<WebElement> elementos = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"search\"]", PO_View.getTimeout());
-		elementos.get(0).click();
+//		List<WebElement> elementos = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"search\"]", PO_View.getTimeout());
+//		elementos.get(0).click();
+		By boton = By.className("btn");
+		driver.findElement(boton).click();
 		// assert que estamos en la pagina correcta
 		PO_NavView.checkIdOnView(driver, "testVistaTienda");
 		
