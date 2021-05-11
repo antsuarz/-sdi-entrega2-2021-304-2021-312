@@ -1,4 +1,4 @@
-module.exports = function (app, swig, gestorBD) {
+module.exports = function (app, swig, gestorBD, logger) {
 
     /**
      * Función que te redirige a la ventana de login por defecto
@@ -15,6 +15,7 @@ module.exports = function (app, swig, gestorBD) {
             res.redirect("/registrarse"+
                 "?mensaje=La contraseña no se ha repetido correctamente"+
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha introducido mal su contraseña");
         } else {
             let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest('hex');
@@ -36,16 +37,19 @@ module.exports = function (app, swig, gestorBD) {
                     res.redirect("/registrarse" +
                         "?mensaje=El usuario ya está registrado en la base de datos" +
                         "&tipoMensaje=alert-danger ");
+                    logger.error("El usuario que va a registrarse ya está registrado en la base de datos");
                 } else {
                     gestorBD.insertarUsuario(usuario, function (id) {
                         if (id == null) {
                             res.redirect("/registrarse?mensaje=Error al registrar el usuario");
+                            logger.error("Error al registrar el usuario");
                         } else {
                             req.session.usuario = usuario.email;
                             req.session.dinero = usuario.dinero;
                             req.session.admin = usuario.tipo;
                             req.session.user = usuario;
                             res.redirect("/tienda");
+                            logger.info("Usuario creado e introducido en la base de datos con éxito");
                         }
                     });
                 }
@@ -64,6 +68,7 @@ module.exports = function (app, swig, gestorBD) {
             admin: req.session.admin,
         });
         res.send(respuesta);
+        logger.info("Redirigiendo al formulario de registro");
     });
 
 
@@ -79,6 +84,7 @@ module.exports = function (app, swig, gestorBD) {
             admin: req.session.admin
         });
         res.send(respuesta);
+        logger.info("Redirigiendo al formulario de identificación");
     });
 
     /**
@@ -86,7 +92,6 @@ module.exports = function (app, swig, gestorBD) {
      * Dependiendo si el usuario está registrado como administrador, o como usuario normal, muestra la tienda, o la vista de administrador.
      */
     app.post("/identificarse", function (req, res) {
-
         if(validarCamposIdentificarse(req.body.email, req.body.password, res)) {
             let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest('hex');
@@ -104,12 +109,14 @@ module.exports = function (app, swig, gestorBD) {
                             res.redirect("/identificarse" +
                                 "?mensaje=El usuario no se ha encontrado en la base de datos" +
                                 "&tipoMensaje=alert-danger ");
+                            logger.error("El usuario no se ha encontrado en la base de datos");
                         }
                         else{
 
                             res.redirect("/identificarse" +
                                 "?mensaje=La contraseña no coincide con la del usuario identificado" +
                                 "&tipoMensaje=alert-danger ");
+                            logger.error("La contraseña no coincide con la del usuario identificado");
                         }
                     });
                 } else {
@@ -118,10 +125,11 @@ module.exports = function (app, swig, gestorBD) {
                     req.session.admin = usuarios[0].tipo;
                     req.session.user = usuarios[0];
                     if (usuarios[0].tipo == "admin") {
-
                         res.redirect("/administrador");
+                        logger.info("Se ha identificado el usuario administrador del sistema");
                     } else {
                         res.redirect("/tienda");
+                        logger.info("Se ha identificado el usuario " + usuarios[0].email+" en el sistema");
                     }
 
                 }
@@ -135,10 +143,11 @@ module.exports = function (app, swig, gestorBD) {
      */
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
-        req.session.dinero = null;
+        req.session.dinero = -1;
         req.session.admin = null;
         req.session.id = null;
         res.redirect("/identificarse");
+        logger.info("Usuario desconectado del sistema");
     })
 
     /**
@@ -150,8 +159,9 @@ module.exports = function (app, swig, gestorBD) {
             gestorBD.obtenerOfertas(criterio, function (ofertas) {
                 if (ofertas == null) {
                     res.redirect("/tienda" +
-                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "?mensaje=Ha ocurrido un error inesperado obteniendo las publicaciones del usuario" +
                         "&tipoMensaje=alert-danger ");
+                    logger.error("Ha ocurrido un error inesperado obteniendo las publicaciones del usuario");
                 } else {
                     let respuesta = swig.renderFile('views/bpublicaciones.html',
                         {
@@ -161,6 +171,7 @@ module.exports = function (app, swig, gestorBD) {
                             admin: req.session.admin
                         });
                     res.send(respuesta);
+                    logger.info("Mostrando publicaciones del usuario");
                 }
             });
         }
@@ -177,6 +188,7 @@ module.exports = function (app, swig, gestorBD) {
                 admin: req.session.admin
             });
             res.send(respuesta);
+            logger.info("Redirigiendo a la vista de administrador");
         }
     });
 
@@ -189,8 +201,9 @@ module.exports = function (app, swig, gestorBD) {
             gestorBD.obtenerUsuarios(criterio, function (usuarios) {
                 if (usuarios == null) {
                     res.redirect("/tienda" +
-                        "?mensaje=Ha ocurrido un error inesperado" +
+                        "?mensaje=Ha ocurrido un error inesperado obteniendo la lista de usuarios" +
                         "&tipoMensaje=alert-danger ");
+                    logger.error("Ha ocurrido un error inesperado obteniendo la lista de usuarios");
                 } else {
                     ordenarPorNombre(usuarios);
                     let respuesta = swig.renderFile('views/blistausuarios.html',
@@ -201,20 +214,25 @@ module.exports = function (app, swig, gestorBD) {
                             admin: req.session.admin
                         });
                     res.send(respuesta);
+                    logger.info("Mostrando la lista de usuarios del sistema");
                 }
             });
         }
     });
 
 
+    /**
+     * Función que ordena por nombre a los usuarios de la lista de usuarios de administrador
+     * @param usuarios, usuarios del sistema que se van a ordenar
+     */
     function ordenarPorNombre(usuarios) {
-            usuarios.sort(function (a, b) {
-                if (a.nombre > b.nombre) return 1;
-                if (a.nombre < b.nombre) return -1;
-                return 0;
-            });
-
-
+        usuarios.sort(function (a, b) {
+            if (a.nombre > b.nombre)
+                return 1;
+            if (a.nombre < b.nombre)
+                return -1;
+            return 0;
+        });
     }
 
     /**
@@ -228,8 +246,10 @@ module.exports = function (app, swig, gestorBD) {
                 gestorBD.eliminarUsuario(criterio, function (usuarios) {
                     if (usuarios == null) {
                         res.send('Error al eliminar usuarios.');
+                        logger.error("Error al eliminar usuario.");
                     }else{
                         res.redirect('/listaUsuarios');
+                        logger.info("Usuario borrado con exito");
                     }
                 });
             } else {
@@ -239,16 +259,19 @@ module.exports = function (app, swig, gestorBD) {
                     gestorBD.eliminarUsuario(criterio, function (usuarios) {
                         if (usuarios == null) {
                             res.send('Error al eliminar usuarios.');
+                            logger.error("Error al eliminar usuarios.");
                         }
                     });
                     if (i == req.body.usuario.length - 1) {
                         res.redirect('/listaUsuarios');
+                        logger.info("Usuario borrado con exito");
                     }
                 }
             }
         }
         else{
             res.redirect('/listaUsuarios');
+            logger.error("No hay usuarios marcados para borrar");
         }
     });
 
@@ -300,21 +323,25 @@ module.exports = function (app, swig, gestorBD) {
                 gestorBD.eliminarOferta(criterioEliminarOfertas, function (ofertas){
                     if(ofertas == null){
                         res.send('Error al borrar ofertas.');
+                        logger.error("Error al borrar ofertas");
                     }
                 })
                 gestorBD.eliminarConversacion(criterioEliminarConversacionesComprar, function (converComp){
                     if(converComp == null){
                         res.send('Error al borrar conversaciones de compra.');
+                        logger.error("Error al borrar conversaciones de compra.");
                     }
                 })
                 gestorBD.eliminarConversacion(criterioEliminarConversacionesVender, function (converVen){
                     if(converVen == null){
                         res.send('Error al borrar conversaciones de venta.');
+                        logger.error("Error al borrar conversaciones de venta.");
                     }
                 })
                 gestorBD.eliminarMensajes(criterioEliminarMensajes, function (msg){
                     if(msg == null){
                         res.send('Error al eliminar mensajes');
+                        logger.error("Error al borrar mensajes");
                     }
                 })
             }
@@ -334,64 +361,67 @@ module.exports = function (app, swig, gestorBD) {
             res.redirect("/registrarse" +
                 "?mensaje=El campo email no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha dejado en blanco el campo email");
             return false;
         }
         else if(usuario.email.length < 10){
             res.redirect("/registrarse" +
                 "?mensaje=Email demasiado corto, debe contener más de 10 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha introducido un email demasiado corto");
             return false;
         }
         else if(usuario.nombre == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo nombre no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha dejado en blanco el campo nombre");
             return false;
         }
         else if(usuario.nombre.length < 3){
             res.redirect("/registrarse" +
                 "?mensaje=El campo nombre debe contener al menos 3 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha dintroducido un nombre demasiado corto");
             return false;
         }
         else if(usuario.apellido == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo apellido no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha dejado en blanco el campo apellido");
             return false;
         }
         else if(usuario.apellido.length < 5){
             res.redirect("/registrarse" +
                 "?mensaje=El campo apellido debe contener al menos 5 caracteres" +
                 "&tipoMensaje=alert-danger ");
-            return false;
-        }
-
-        else if(usuario.apellido == ""){
-            res.redirect("/registrarse" +
-                "?mensaje=El campo apellido no puede estar en blanco" +
-                "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse haintroducido un apellido demasiado corto");
             return false;
         }
         else if(password == ""){
             res.redirect("/registrarse" +
                 "?mensaje=El campo contraseña no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha dejado en blanco el campo contraseña");
             return false;
         }
         else if(password.length < 8){
             res.redirect("/registrarse" +
                 "?mensaje=La contraseña debe contener al menos 8 caracteres" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha introducido una contraseña invalida");
             return false;
         }
         else if(rePassword == ""){
             res.redirect("/registrarse" +
                 "?mensaje=Por favor repite tu contraseña" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario que va a registrarse ha dejado en blanco el campo de repetir contraseña");
             return false;
         }
         else
+            logger.info("El usuario que va a registrarse ha rellenado correctamente los campos del formulario");
             return true;
     }
 
@@ -407,15 +437,18 @@ module.exports = function (app, swig, gestorBD) {
             res.redirect("/identificarse" +
                 "?mensaje=El campo email no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario a identificar ha dejado en blanco el campo email");
             return false;
         }
         else if(password == ""){
             res.redirect("/identificarse" +
                 "?mensaje=El campo contraseña no puede estar en blanco" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El usuario a identificar ha dejado en blanco el campo contraseña");
             return false;
         }
         else{
+            logger.info("El usuario a identificarse ha completado sin errores los campos de identificación");
             return true;
         }
     }

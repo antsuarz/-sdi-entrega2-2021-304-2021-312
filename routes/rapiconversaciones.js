@@ -1,4 +1,4 @@
-module.exports = function (app, gestorBD) {
+module.exports = function (app, gestorBD, logger) {
 
     /**
      * Funcíon que carga todas las conversaciones de un usuario, cuando este es el comprador
@@ -7,10 +7,11 @@ module.exports = function (app, gestorBD) {
         let criterio = {comprador: req.session.usuario};
         gestorBD.obtenerConversacion(criterio, function (conversacionesComprar) {
             if (conversacionesComprar == null) {
-                console.log("No ha cargado bien la lista de conversaciones de compra");
+                logger.error("No ha cargado bien la lista de conversaciones de compra");
             } else {
                 res.status(200);
                 res.send(JSON.stringify(conversacionesComprar));
+                logger.info("Ha cargado bien la lista de conversaciones de compra");
             }
         });
     });
@@ -22,10 +23,11 @@ module.exports = function (app, gestorBD) {
         let criterio = {vendedor: req.session.usuario};
         gestorBD.obtenerConversacion(criterio, function (conversacionesVender) {
             if (conversacionesVender == null) {
-                console.log("No ha cargado bien la lista de conversaciones de venta");
+                logger.error("No ha cargado bien la lista de conversaciones de venta");
             } else {
                 res.status(200);
                 res.send(JSON.stringify(conversacionesVender));
+                logger.info("Conversciones obtenidas con exito");
             }
         });
     });
@@ -44,7 +46,9 @@ module.exports = function (app, gestorBD) {
                 res.json({
                     error : "se ha producido un error"
                 })
+                logger.error("Se ha producido un error eliminando los mensajes");
             } else {
+                logger.info("Mensajes eliminados con éxito");
                 gestorBD.eliminarConversacion(criterio,function(conversaciones){
                     if(conversaciones.length == 0)
                         console.log(cagaste);
@@ -53,9 +57,11 @@ module.exports = function (app, gestorBD) {
                         res.json({
                             error : "se ha producido un error"
                         })
+                        logger.error("Se ha producido un error al eliminar la conversación");
                     } else {
                         res.status(200);
                         res.send( JSON.stringify(conversaciones) );
+                        logger.info("Conversacion eliminada con éxito");
                     }
                 });
             }

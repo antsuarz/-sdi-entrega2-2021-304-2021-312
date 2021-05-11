@@ -1,4 +1,4 @@
-module.exports = function(app, gestorBD) {
+module.exports = function(app, gestorBD, logger) {
 
     /**
      * Función que autentica a un usuario en la aplicacion, comprueba si esta en la base de datos, si es asi, marca al usuario como autenticado.
@@ -22,6 +22,7 @@ module.exports = function(app, gestorBD) {
             } else {
                 gestorBD.obtenerUsuarios(criterio, function (usuarios) {
                     if (usuarios == null || usuarios.length == 0) {
+                        logger.error("El usuario no se ha podido autenticar");
                         let elProblemaEsElPassword={
                             email : req.body.email
                         }
@@ -33,6 +34,7 @@ module.exports = function(app, gestorBD) {
                                 res.json({
                                     errores: errors
                                 })
+                                logger.error("La contraseña introducida es incorrecta");
                             }
                             else{
                                 res.status(401);
@@ -52,6 +54,7 @@ module.exports = function(app, gestorBD) {
                             autenticado: true,
                             token: token
                         })
+                        logger.info("Usuario autenticado");
                     }
                 });
             }
@@ -66,11 +69,15 @@ module.exports = function(app, gestorBD) {
     function validaDatosUsuario(usuario, funcionCallback) {
         let errors = new Array();
         if (usuario.email === null || typeof usuario.email === 'undefined' ||
-            usuario.email === "")
-            errors.push("El campo email no puede estar vacio")
+            usuario.email === ""){
+            errors.push("El campo email no puede estar vacio");
+            logger.error("El campo email no puede estar vacio");
+        }
         if (usuario.password === null || typeof usuario.password === 'undefined' ||
-            usuario.password === "")
-            errors.push("El campo contraseña no puede estar vacio")
+            usuario.password === ""){
+            errors.push("El campo contraseña no puede estar vacio");
+            logger.error("El campo contraseña no puede estar vacio");
+        }
         if (errors.length <= 0)
             funcionCallback(null)
         else

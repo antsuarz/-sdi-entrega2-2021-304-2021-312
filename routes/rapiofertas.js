@@ -1,4 +1,4 @@
-module.exports = function(app, gestorBD) {
+module.exports = function(app, gestorBD, logger) {
 
     /**
      * Función que obtiene todas las ofertas de la base de datos
@@ -8,6 +8,7 @@ module.exports = function(app, gestorBD) {
         let criterio ={};
         gestorBD.obtenerOfertas( criterio , function(ofertas) {
             if (ofertas == null) {
+                logger.error("Se ha producido un error obteniendo las ofertas");
                 res.status(500);
                 res.json({
                     error : "se ha producido un error"
@@ -20,6 +21,7 @@ module.exports = function(app, gestorBD) {
                 }
                 res.status(200);
                 res.send( JSON.stringify(ofertasFiltradas) );
+                logger.info("Ofertas obtenidas con exito");
             }
         });
     });
@@ -33,12 +35,13 @@ module.exports = function(app, gestorBD) {
 
             gestorBD.obtenerOfertas(criterio, function (ofertas) {
                 if (ofertas == null) {
+                    logger.error("Se ha producido un error obteniendo las ofertas");
                     res.status(500);
                     res.json({
                         error: "se ha producido un error"
                     })
                 } else {
-
+                    logger.info("Ofertas obtenidas con exito");
                     res.status(200);
                     res.send(JSON.stringify(ofertas));
 
@@ -59,9 +62,11 @@ module.exports = function(app, gestorBD) {
                 res.json({
                     error : "se ha producido un error"
                 })
+                logger.error("Se ha producido un error eliminando la oferta");
             } else {
                 res.status(200);
                 res.send( JSON.stringify(ofertas) );
+                logger.info("Oferta eliminada con exito");
             }
         });
     });
@@ -85,10 +90,12 @@ module.exports = function(app, gestorBD) {
                 res.json({
                     error : "se ha producido un error"
                 })
+                logger.error("Se ha producido un error obteniendo las ofertas");
             } else {
                 let criterio;
                 //El problema aqui es obtener el comprador, por lo que se lo pasamos por parámetro
                 if(req.session.usuario == oferta[0].autor){
+                    logger.info("El usuario identificado y el autor de la oferta son el mismo");
                     criterio = {
                         "oferta._id": gestorBD.mongo.ObjectID(req.params.id),
                         "vendedor": req.session.usuario,
@@ -97,6 +104,7 @@ module.exports = function(app, gestorBD) {
                 }
                 //si resulta que comprador y vendedor son distintos, no necesitamos usar el parámetro
                 else {
+                    logger.info("El usuario identificado y el autor de la oferta son distintos");
                     criterio = {
                         "oferta._id": gestorBD.mongo.ObjectID(req.params.id),
                         "comprador": req.session.usuario,
@@ -109,7 +117,9 @@ module.exports = function(app, gestorBD) {
                     res.json({
                         error: "No se ha podido generar el listado"
                     })
+                    logger.error("No se ha podido generar el listado");
                 } else if (lista.length == 0) {
+                    logger.info("No hay conversación, hay que insertar una nueva en la base de datos");
                     insertarConversacionBD(criterio, req, res);
                 } else {
                     let mensajeNuevo = {
@@ -119,6 +129,7 @@ module.exports = function(app, gestorBD) {
                         "conversacion": gestorBD.mongo.ObjectID(lista[0]._id),
                         "leido": false
                     }
+                    logger.info("Insertando mensaje nuevo en la conversación");
                     insertarMensajeBD(mensajeNuevo, req, res);
                 }
             });
@@ -142,9 +153,11 @@ module.exports = function(app, gestorBD) {
                 res.json({
                     error : "se ha producido un error"
                 })
+                logger.error("Se ha producido un error obteniendo a la oferta");
             } else {
                 let criterio;
                 if(req.session.usuario == oferta[0].autor){
+                    logger.info("El autor y el usuario identificado son el mismo");
                     criterio = {
                         "oferta._id": gestorBD.mongo.ObjectID(req.params.id),
                         "vendedor": req.session.usuario,
@@ -152,6 +165,7 @@ module.exports = function(app, gestorBD) {
                     }
                 }
                 else {
+                    logger.info("El autor y el usuario identificado son distintos");
                     criterio = {
                         "oferta._id": gestorBD.mongo.ObjectID(req.params.id),
                         "comprador": req.session.usuario,
@@ -163,14 +177,15 @@ module.exports = function(app, gestorBD) {
                     if (lista == null ) {
                         res.status(500);
                         res.json({ error: "No se ha podido generar el listado"})
+                        logger.error("No se ha podido generar el listado de conversaciones");
                     }
                     else if(lista.length == 0){
                         res.status(200);
                         res.send(JSON.stringify(new Array()));
+                        logger.info("No hay conversacion, mostrando una lista vacia");
                     }
                     else {
                         let conversacion = {
-
                             "conversacion": gestorBD.mongo.ObjectID(lista[0]._id)
                         };
                         gestorBD.obtenerMensajes(conversacion, function (mensajes) {
@@ -179,9 +194,11 @@ module.exports = function(app, gestorBD) {
                                 res.json({
                                     error: "se ha producido un error"
                                 })
+                                logger.error("Se ha producido un error, obteniendo los mensajes");
                             } else {
                                 res.status(200);
                                 res.send(JSON.stringify(mensajes));
+                                logger.info("Mensajes introducidos con exito");
                             }
                         });
                     }
@@ -210,6 +227,7 @@ module.exports = function(app, gestorBD) {
                 res.json({
                     error : "se ha producido un error obteniendo las ofertas"
                 })
+                logger.error("No se han podido obtener las ofertas");
             } else {
                 let conversacion = {
                     "vendedor": ofertas[0].autor,
@@ -222,7 +240,9 @@ module.exports = function(app, gestorBD) {
                         res.json({
                             error: "se ha producido un error insertando la conversación"
                         })
+                        logger.error("Se ha producido un error insertando la conversación");
                     } else {
+                        logger.info("Conversación insertada con éxito");
                         let mensajeNuevo = {
                             "contenido": req.body.contenido,
                             "fecha": fechaString,
@@ -237,9 +257,11 @@ module.exports = function(app, gestorBD) {
                                 res.json({
                                     error: "No se ha podido generar el listado"
                                 })
+                                logger.error("No se ha podido generar el listado de conversaciones");
                             }
                             else{
                                 insertarMensajeBD(mensajeNuevo, req, res);
+                                logger.info("Mensajes insertados con éxito");
                             }
                         })
                     }
@@ -262,14 +284,12 @@ module.exports = function(app, gestorBD) {
                 res.json({
                     error: "se ha producido un error al insertar el mensaje"
                 })
+                logger.error("Se ha proucido un error al insertar el mensaje");
             } else {
                 res.status(200);
                 res.send(JSON.stringify(mensaje));
+                logger.info("Mensaje introducido en la base de datos con exito");
             }
         });
     }
-
-
-
-
 }

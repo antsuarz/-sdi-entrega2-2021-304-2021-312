@@ -30,14 +30,17 @@ app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:270
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
-//TODO logger
+//Logger
+var log4js = require("log4js");
+var logger = log4js.getLogger();
+logger.level = "debug";
 
 //Rutas
-require("./routes/rusuarios.js")(app, swig, gestorBD);
-require("./routes/rofertas.js")(app, swig, gestorBD);
-require("./routes/rapiofertas.js")(app, gestorBD);
-require("./routes/rapiusuarios.js")(app, gestorBD);
-require("./routes/rapiconversaciones.js")(app, gestorBD);
+require("./routes/rusuarios.js")(app, swig, gestorBD, logger);
+require("./routes/rofertas.js")(app, swig, gestorBD, logger);
+require("./routes/rapiofertas.js")(app, gestorBD, logger);
+require("./routes/rapiusuarios.js")(app, gestorBD, logger);
+require("./routes/rapiconversaciones.js")(app, gestorBD, logger);
 
 
 https.createServer({

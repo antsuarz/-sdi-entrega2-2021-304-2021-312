@@ -43,7 +43,7 @@
 	    <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
         <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
         {% endif %}
-        {% if user != null && dinero !=null && admin != 'admin' %}
+        {% if user != null && dinero > -1 && admin != 'admin' %}
         <li id="mDinero"><a>Dinero:{{dinero}} €</a></li>
         <li id="mEmail"><a>Email:{{user}}</a></li>
         {% endif %}

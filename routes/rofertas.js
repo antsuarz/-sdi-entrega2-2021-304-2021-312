@@ -1,4 +1,4 @@
-module.exports = function(app, swig, gestorBD) {
+module.exports = function(app, swig, gestorBD, logger) {
 
     /**
      * Funcion que inicializa la ventana tienda
@@ -11,6 +11,7 @@ module.exports = function(app, swig, gestorBD) {
             ofertas : ofertas
         });
         res.send(respuesta);
+        logger.info("Mostrando la tienda");
     });
 
     /**
@@ -25,6 +26,7 @@ module.exports = function(app, swig, gestorBD) {
             admin: req.session.admin
         });
         res.send(respuesta);
+        logger.info("Mostrando el formulario de agregar ofertas");
     })
 
     /**
@@ -35,8 +37,9 @@ module.exports = function(app, swig, gestorBD) {
         gestorBD.obtenerOfertas(criterio,function(ofertas){
             if ( ofertas == null ){
                 res.redirect("/tienda" +
-                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "?mensaje=Ha ocurrido un error inesperado al obtener ofertas"+
                     "&tipoMensaje=alert-danger ");
+                logger.error("Ha ocurrido un error inesperado al obtener ofertas");
             } else {
                 let respuesta = swig.renderFile('views/boferta.html',
                     {
@@ -46,6 +49,7 @@ module.exports = function(app, swig, gestorBD) {
                         admin: req.session.admin
                     });
                 res.send(respuesta);
+                logger.info("Mostrar lista de ofertas");
             }
         });
     });
@@ -91,6 +95,7 @@ module.exports = function(app, swig, gestorBD) {
                         res.redirect("/tienda" +
                             "?mensaje=Ha ocurrido un error al modificar el dinero del usuario" +
                             "&tipoMensaje=alert-danger ");
+                        logger.error("Ha ocurrido un error al modificar el dinero del usuario");
                     } else {
                         insertarOfertaBD(oferta, req, res);
                     }
@@ -99,6 +104,7 @@ module.exports = function(app, swig, gestorBD) {
                 res.redirect("/ofertas/agregar" +
                     "?mensaje=No puedes comprar esta oferta" +
                     "&tipoMensaje=alert-danger ");
+                logger.error("El usuario no puede comprar la oferta");
             }
         } else {
             insertarOfertaBD(oferta, req, res);
@@ -106,6 +112,7 @@ module.exports = function(app, swig, gestorBD) {
     }
     else{
         res.redirect("/identificate");
+        logger.error("No hay usuario identificado, no se puede insertar la oferta");
     }
     });
 
@@ -125,6 +132,7 @@ module.exports = function(app, swig, gestorBD) {
         gestorBD.obtenerOfertasPg(criterio, pg , function(ofertas, total) {
             if (ofertas == null) {
                 res.send("Error al listar ");
+                logger.error("Error al listar ");
             } else {
                 let ultimaPg = total/5;
                 if (total % 5 > 0 ){
@@ -145,6 +153,7 @@ module.exports = function(app, swig, gestorBD) {
                     admin: req.session.admin,
                 });
                 res.send(respuesta);
+                logger.info("Cargando la tienda");
             }
         });
     });
@@ -160,8 +169,10 @@ module.exports = function(app, swig, gestorBD) {
                 res.redirect("/tienda" +
                     "?mensaje=Ha ocurrido un error inesperado"+
                     "&tipoMensaje=alert-danger ");
+                logger.error("Ha ocurrido un error inesperado al borrar usuarios");
             } else {
                 res.redirect("/publicaciones");
+                logger.info("Mostrando publicaciones");
             }
         });
     })
@@ -178,22 +189,26 @@ module.exports = function(app, swig, gestorBD) {
                 res.redirect("/tienda" +
                     "?mensaje=Ha ocurrido un error inesperado"+
                     "&tipoMensaje=alert-danger ");
+                logger.error("Ha ocurrido un error inesperado obteniendo las ofertas");
             }
             else{
                 if(oferta[0].autor == req.session.usuario){
                     res.redirect("/tienda" +
                         "?mensaje=No puedes comprar una oferta que tu has publicado"+
                         "&tipoMensaje=alert-danger ");
+                    logger.error("No puedes comprar una oferta que tu has publicado");
                 }
                 else if(oferta[0].comprado){
                     res.redirect("/tienda" +
                         "?mensaje=La oferta ya fue vendida"+
                         "&tipoMensaje=alert-danger ");
+                    logger.error("En usuario no puede comprar una oferta que ya vendida");
                 }
                 else if(oferta[0].precio > req.session.dinero){
                     res.redirect("/tienda" +
                         "?mensaje=No tienes suficiente dinero para comprar esta oferta"+
                         "&tipoMensaje=alert-danger ");
+                    logger.error("El usuario no tiene suficiente dinero para comprar esta oferta");
                 }
                 else{
                     let ofertaModificada = {
@@ -204,6 +219,7 @@ module.exports = function(app, swig, gestorBD) {
                             res.redirect("/tienda" +
                                 "?mensaje=Se ha producido un error inesperado al modificar el estado de la oferta"+
                                 "&tipoMensaje=alert-danger ");
+                            logger.error("Se ha producido un error inesperado al modificar el estado de la oferta");
                         } else {
                             let compra = {
                                 usuario : req.session.usuario,
@@ -214,31 +230,45 @@ module.exports = function(app, swig, gestorBD) {
                                     res.redirect("/tienda" +
                                         "?mensaje=Se ha producido un error al insertar su compra en la base de datos"+
                                         "&tipoMensaje=alert-danger ");
+                                    logger.error("Se ha producido un error al insertar su compra en la base de datos");
                                 } else {
-                                    let comprador={"_id": gestorBD.mongo.ObjectID(req.session.user._id)};
+                                    let comprador = {"_id": gestorBD.mongo.ObjectID(req.session.user._id)};
+                                    if (req.session.dinero - oferta[0].precio >= 0) {
+
                                     let dineroActual = {dinero: req.session.dinero - oferta[0].precio};
-                                    gestorBD.modificarDineroUsuario(comprador,dineroActual, function (id){
+
+                                    gestorBD.modificarDineroUsuario(comprador, dineroActual, function (id) {
                                         if (id == null) {
                                             res.redirect("/tienda" +
-                                                "?mensaje=Se ha producido un error al modificar el dinero del usuario"+
+                                                "?mensaje=Se ha producido un error al modificar el dinero del usuario" +
                                                 "&tipoMensaje=alert-danger ");
+                                            logger.error("Se ha producido un error al modificar el dinero del usuario");
                                         } else {
                                             let criterio = {
-                                                email : req.session.usuario,
+                                                email: req.session.usuario,
                                             }
-                                            gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+                                            gestorBD.obtenerUsuarios(criterio, function (usuarios) {
                                                 if (usuarios == null || usuarios.length == 0) {
                                                     res.redirect("/identificarse" +
-                                                        "?mensaje=No se ha podido identificar al usuario"+
+                                                        "?mensaje=No se ha podido identificar al usuario" +
                                                         "&tipoMensaje=alert-danger ");
+                                                    logger.error("Se ha producido intentando identificar al usuario");
                                                 } else {
                                                     req.session.dinero = usuarios[0].dinero;
                                                     res.redirect("/compras");
+                                                    logger.info("Compra realizada con exito");
                                                 }
                                             });
 
                                         }
                                     });
+                                    }
+                                    else{
+                                        res.redirect("/tienda" +
+                                            "?mensaje=No tienes suficiente dinero" +
+                                            "&tipoMensaje=alert-danger ");
+                                        logger.error("El usuario no tiene dinero suficiente para comprar");
+                                    }
                                 }
                             });
                         }
@@ -260,6 +290,7 @@ module.exports = function(app, swig, gestorBD) {
                     res.redirect("/tienda" +
                         "?mensaje=Se ha producido un error al obtener un listado con sus compras" +
                         "&tipoMensaje=alert-danger ");
+                    logger.error("Se ha producido un error al obtener un listado con las compras");
                 } else {
                     let ofertasCompradasIds = [];
                     for (i = 0; i < compras.length; i++) {
@@ -275,6 +306,7 @@ module.exports = function(app, swig, gestorBD) {
                             admin: req.session.admin
                         });
                         res.send(respuesta);
+                        logger.info("Mostrando ofertas compradas por el usuario "+ req.session.usuario);
                     });
                 }
             });
@@ -295,6 +327,7 @@ module.exports = function(app, swig, gestorBD) {
                 res.redirect("/ofertas/destacadas" +
                     "?mensaje=Ha ocurrido un error inesperado"+
                     "&tipoMensaje=alert-danger ");
+                logger.error("Se ha producido un error al obtener un listado con las ofertas destacadas");
             } else {
                 let respuesta = swig.renderFile('views/bdestacadas.html',
                     {
@@ -304,6 +337,7 @@ module.exports = function(app, swig, gestorBD) {
                         admin: req.session.admin
                     });
                 res.send(respuesta);
+                logger.info("Mostrando ofertas destacadas");
             }
         });
     })
@@ -320,9 +354,10 @@ module.exports = function(app, swig, gestorBD) {
                     res.redirect("/tienda" +
                         "?mensaje=Ha ocurrido un error inesperado" +
                         "&tipoMensaje=alert-danger ");
+                    logger.error("Se ha producido un error al insertar la oferta");
                 } else {
                     res.redirect("/publicaciones");
-
+                    logger.info("Oferta insertada con exito");
                 }
             });
     }
@@ -338,16 +373,19 @@ module.exports = function(app, swig, gestorBD) {
             res.redirect("/ofertas/agregar" +
                 "?mensaje=El campo nombre no puede estar vacio" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El campo nombre no puede estar vacio");
         }
         else if(oferta.detalles == ""){
             res.redirect("/ofertas/agregar" +
                 "?mensaje=El campo detalles no puede estar vacio" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El campo detalles no puede estar vacio");
         }
         else if(oferta.precio == ""){
             res.redirect("/ofertas/agregar" +
                 "?mensaje=El campo precio no puede estar vacio" +
                 "&tipoMensaje=alert-danger ");
+            logger.error("El campo precio no puede estar vacio");
         }
     }
 };
