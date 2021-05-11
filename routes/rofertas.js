@@ -178,6 +178,74 @@ module.exports = function(app, swig, gestorBD, logger) {
         });
     })
 
+    app.get('/oferta/destacar/:id', function(req,res){
+        let ofertaId = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.obtenerOfertas(ofertaId, function(oferta){
+            if(oferta == null){
+                res.redirect("/publicaciones" +
+                    "?mensaje=Ha ocurrido un error inesperado"+
+                    "&tipoMensaje=alert-danger ");
+                logger.error("Ha ocurrido un error inesperado obteniendo las ofertas");
+            }
+            else{
+                if(req.session.dinero < 20){
+                    res.redirect("/publicaciones" +
+                        "?mensaje=No tienes suficiente dinero para destacar esta oferta"+
+                        "&tipoMensaje=alert-danger ");
+                    logger.error("El usuario no tiene suficiente dinero para destacar esta oferta");
+                }
+                else{
+                    let ofertaModificada = {
+                        destacada: "on"
+                    }
+                    gestorBD.modificarOferta(ofertaId, ofertaModificada, function (result){
+                        if (result == null) {
+                            res.redirect("/publicaciones" +
+                                "?mensaje=Se ha producido un error inesperado al modificar el estado de la oferta"+
+                                "&tipoMensaje=alert-danger ");
+                            logger.error("Se ha producido un error inesperado al modificar el estado de la oferta");
+                        } else {
+                            let comprador = {"_id": gestorBD.mongo.ObjectID(req.session.user._id)};
+                            let dineroActual = {dinero: req.session.dinero - 20};
+                            gestorBD.modificarDineroUsuario(comprador, dineroActual, function (id) {
+                                if (id == null) {
+                                    res.redirect("/publicaciones" +
+                                        "?mensaje=Se ha producido un error al modificar el dinero del usuario" +
+                                        "&tipoMensaje=alert-danger ");
+                                    logger.error("Se ha producido un error al modificar el dinero del usuario");
+                                } else {
+                                    let criterio = {
+                                        email: req.session.usuario,
+                                    }
+                                    gestorBD.obtenerUsuarios(criterio, function (usuarios) {
+                                        if (usuarios == null || usuarios.length == 0) {
+                                            res.redirect("/identificarse" +
+                                                "?mensaje=No se ha podido identificar al usuario" +
+                                                "&tipoMensaje=alert-danger ");
+                                            logger.error("Se ha producido intentando identificar al usuario");
+                                        } else {
+                                            if(dineroActual == 0){
+                                                req.session.ususario = usuarios[0].email;
+                                                req.session.dinero = 0;
+                                            }
+                                            else{
+                                                req.session.dinero = dineroActual;
+                                            }
+                                            logger.info("Se ha destacado la oferta con éxito");
+                                            res.redirect("/publicaciones");
+                                        }
+                                    });
+
+                                }
+                            })
+                        }
+                    });
+                }
+            }
+        });
+
+    })
+
     /**
      * Función para comprar una determinada oferta
      * Antes de comprar, comprueba la disponibilidad de la oferta, si el comprador no es el autor de esta, y si este tiene suficiente dinero para adquirirla

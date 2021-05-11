@@ -20,9 +20,9 @@
 				<td>{{ oferta.nombre }}</td>
 				<td>{{ oferta.detalles }}</td>
 				{%if oferta.destacada == "on"%}
-				<td>Sí</td>
+				<td>Destacada</td>
 				{%else%}
-				<td>No</td>
+				<td><a id="btnDestacar" href="/oferta/destacar/{{ oferta._id.toString() }}">Destacar</a></td>
 				{% endif%}
 				{%if !oferta.comprado%}
 				<td><a id="btnEliminar" href="/oferta/eliminar/{{ oferta._id.toString() }}">Eliminar</a> <br>
