@@ -1,0 +1,66 @@
+{% extends "base.html" %} 
+
+{% block titulo %} Detalles de la oferta {{ oferta.nombre }}{% endblock %}
+
+{% block contenido_principal %}
+
+	 <div class="row">
+		<div class="media col-xs-10">
+		  <div class="media-body">
+			 <h2 id="testVistaOfertaConcreta">{{oferta.nombre}}</h2>
+			 <p>Propietario : {{oferta.autor}}</p>
+			  <div>
+				  <h4>Detalles:</h4>
+				  <p>{{oferta.detalles}}</p>
+			  </div>
+			  <p>{{oferta.fecha}}</p>
+			 <a id="btnCompra" type="button" class="btn btn-primary pull-right" href="/oferta/comprar/{{oferta._id.toString()}}">{{oferta.precio}} €</a>
+		  </div>
+		</div>
+	  </div>
+<h2 id="testVistaOfertasAgregar">Editar Oferta</h2>
+<form class="form-horizontal" method="post" action="/oferta/editar" encType="multipart/form-data">
+	<div class="form-group">
+
+		<div class="col-sm-10">
+			<input type="hidden" class="form-control" name="ident" id="ident"
+				   placeholder="Id de la oferta" value="{{oferta._id.toString()}}" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="nombre">Nombre:</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="nombre" id="nombre"
+				   placeholder="Nombre de la oferta" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="detalles">Detalles:</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="detalles" id="detalles"
+				   placeholder="descripción de la oferta" />
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="precio">Precio (€):</label>
+		<div class="col-sm-10">
+			<input type="number" class="form-control" name= "precio" id="precio"
+				   placeholder="precio de la oferta" />
+		</div>
+	</div>
+<!--	<div class="form-group">-->
+<!--		<label class="control-label col-sm-2" for="destacada">Destacar Oferta:</label>-->
+<!--		<div class="col-sm-10">-->
+<!--			<input class="form-check-input" type="checkbox" name="destacada" id="destacada"> Destacar una oferta supone un coste adicional de 20€ en su publicación.</input>-->
+<!--		</div>-->
+<!--	</div>-->
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-primary">Modificar</button>
+		</div>
+	</div>
+</form>
+	  
+
+{% endblock %}

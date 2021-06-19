@@ -56,13 +56,13 @@ module.exports = {
             }
         });
     },
-    insertarOferta : function(ofertaAñadir, funcionCallback) {
+    insertarOferta : function(ofertaAnadir, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('ofertas');
-                collection.insertOne(ofertaAñadir, function(err, result) {
+                collection.insertOne(ofertaAnadir, function(err, result) {
                     if (err) {
                         funcionCallback(null);
                     } else {

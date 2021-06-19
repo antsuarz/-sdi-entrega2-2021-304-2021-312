@@ -26,7 +26,15 @@ let gestorBD = require("./modules/gestorBD.js");
 gestorBD.init(app,mongo);
 
 app.set('port', 8081);
-app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:27017,tiendamusica-shard-00-01.jxgw2.mongodb.net:27017,tiendamusica-shard-00-02.jxgw2.mongodb.net:27017/myWallapop?ssl=true&replicaSet=atlas-od6pn1-shard-0&authSource=admin&retryWrites=true&w=majority');
+//app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00.jxgw2.mongodb.net:27017,tiendamusica-shard-00-01.jxgw2.mongodb.net:27017,tiendamusica-shard-00-02.jxgw2.mongodb.net:27017/myWallapop?ssl=true&replicaSet=atlas-od6pn1-shard-0&authSource=admin&retryWrites=true&w=majority');
+app.set('db', 'mongodb://admin:sdi@tiendamusica-shard-00-00.any5v.mongodb.net:27017,' +
+    'tiendamusica-shard-00-01.any5v.mongodb.net:27017,' +
+    'tiendamusica-shard-00-02.any5v.mongodb.net:27017' +
+    '/myFirstDatabase?ssl=true' +
+    '&replicaSet=atlas-exyqcf-shard-0' +
+    '&authSource=admin' +
+    '&retryWrites=true' +
+    '&w=majority');
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
